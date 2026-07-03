@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>SNAP · Clinical Pathway · Case DPP-01</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Roboto:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+/* =====================================================
+   DESIGN TOKENS
+   ===================================================== */
+:root {
+  /* type */
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-body: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* palette — Seragen + clinical accent */
+  /* palette — Seragen: dominant white · very light gray · pastel pink (judicious) */
+  --page: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-alt: #F7F6F6;
+  --ink: #1A1A1A;
+  --ink-2: #37373A;
+  --ink-3: #6E6E73;
+  --ink-4: #A2A2A8;
+  --line: #ECEAEA;
+  --line-2: #F3F1F1;
+
+  /* pastel pink — the single chromatic accent, used judiciously */
+  --pink: #E8A4B4;
+  --pink-strong: #A85F6E;
+  --pink-tint: #FBF2F4;
+  --pink-glow: rgba(232, 164, 180, 0.28);
+
+  /* former clinical accent → neutral graphite (keeps semantic contrast without a second colour) */
+  --teal: #57575B;
+  --teal-strong: #333336;
+  --teal-tint: #F2F1F1;
+  --teal-glow: rgba(87, 87, 91, 0.12);
+
+  /* former evidence accent → warm neutral gray (no gold) */
+  --gold: #8C8688;
+  --gold-tint: #F5F3F3;
+
+  /* spatial */
+  --radius: 4px;
+  --radius-lg: 10px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 220ms;
+  --dur-med: 380ms;
+  --dur-slow: 620ms;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--page);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.serif { font-family: var(--font-head); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* =====================================================
+   APP FRAME
+   ===================================================== */
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -------- HEADER -------- */
+.app-header {
+  padding: 22px 32px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+.app-header::after {
+  content: '';
+  position: absolute;
+  left: 32px; right: 32px; bottom: -1px; height: 2px;
+  background: linear-gradient(to right, var(--pink) 0%, var(--pink) 30%, transparent 60%);
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: growRule 0.9s var(--ease-out) 0.2s forwards;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--pink-strong);
+  font-weight: 600;
+  margin-bottom: 6px;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 0.1s forwards;
+}
+h1.title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.05;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 3px;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.25s forwards;
+}
+.subtitle {
+  font-family: var(--font-head);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-3);
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.4s forwards;
+}
+
+.case-strip {
+  display: flex;
+  gap: 0;
+  margin-top: 18px;
+  padding: 12px 0 0 0;
+  border-top: 1px dashed var(--line-2);
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 0.55s forwards;
+}
+.case-cell {
+  flex: 1;
+  padding: 0 18px;
+  border-right: 1px solid var(--line-2);
+  min-width: 0;
+}
+.case-cell:first-child { padding-left: 0; }
+.case-cell:last-child { border-right: none; padding-right: 0; }
+.case-cell .lbl {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.case-cell .val {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =====================================================
+   TIMELINE STAGE
+   ===================================================== */
+.stage {
+  padding: 42px 32px 60px;
+  flex: 1;
+  position: relative;
+}
+.stage-intro {
+  max-width: 640px;
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 0.85s forwards;
+}
+.stage-intro .kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.stage-intro h2 {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.stage-intro p {
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* -------- TIMELINE AXIS -------- */
+.timeline-wrap {
+  position: relative;
+  padding: 0 0 24px 0;
+  margin-bottom: 12px;
+}
+
+.timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  padding-top: 26px;
+}
+
+/* the axis line */
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 60px;
+  left: 6%;
+  right: 6%;
+  height: 2px;
+  background: linear-gradient(to right, var(--pink) 0%, var(--teal) 60%, var(--teal) 100%);
+  border-radius: 2px;
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: growAxis 1.0s var(--ease-out) 1.0s forwards;
+}
+
+.phase {
+  position: relative;
+  padding-top: 8px;
+  cursor: default;
+}
+.phase-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 34px;
+  opacity: 0;
+  animation: fadeIn 0.5s var(--ease-out) forwards;
+}
+.phase-marker {
+  position: absolute;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--teal);
+  z-index: 2;
+  opacity: 0;
+  animation: pop 0.4s var(--ease-out) forwards;
+}
+.phase-marker::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--teal);
+  opacity: 0;
+  animation: pulseRing 2.4s ease-out infinite;
+  animation-play-state: paused;
+}
+.phase[data-active="true"] .phase-marker { border-color: var(--pink-strong); }
+.phase[data-active="true"] .phase-marker::after { animation-play-state: running; border-color: var(--pink-strong); }
+
+.phase-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 8px;
+  margin-top: 40px;
+}
+
+.node {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px 11px;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+  opacity: 0;
+  transform: translateY(8px);
+}
+.node.reveal { animation: nodeIn 0.5s var(--ease-out) forwards; }
+
+.node:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -12px var(--teal-glow), 0 2px 6px -3px rgba(0,0,0,0.06);
+}
+.node[data-selected="true"] {
+  border-color: var(--pink-strong);
+  box-shadow: 0 0 0 3px var(--pink-glow), 0 8px 24px -14px rgba(0,0,0,0.14);
+}
+.node .node-num {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-4);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
+}
+.node .node-title {
+  font-family: var(--font-head);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+.node .node-sub {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+.node .node-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  padding: 2px 5px;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.node.diagnostic .node-tag { background: var(--teal-tint); color: var(--teal-strong); }
+.node.intervention .node-tag { background: var(--pink-tint); color: var(--pink-strong); }
+.node.surveillance .node-tag { background: var(--gold-tint); color: var(--gold); }
+
+/* fork connector line from axis down to first node */
+.phase-nodes::before {
+  content: '';
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--teal), transparent);
+  opacity: 0;
+  animation: fadeIn 0.4s var(--ease-out) forwards;
+}
+
+/* -------- HINT -------- */
+.hint {
+  text-align: center;
+  margin: 40px auto 0;
+  color: var(--ink-4);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  animation: fadeUp 0.6s var(--ease-out) 5.6s forwards;
+}
+.hint .hint-arrow {
+  display: inline-block;
+  margin: 0 8px;
+  color: var(--pink-strong);
+  animation: arrowNudge 2s ease-in-out infinite;
+}
+
+/* =====================================================
+   DETAIL PANEL — slides from right (desktop) / bottom (mobile)
+   ===================================================== */
+.panel-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 21, 25, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-med) var(--ease-out);
+  z-index: 100;
+}
+.panel-scrim.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(620px, 92vw);
+  background: var(--surface);
+  z-index: 101;
+  transform: translateX(100%);
+  transition: transform var(--dur-slow) var(--ease-in-out);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: -8px 0 60px -20px rgba(0,0,0,0.2);
+}
+.panel.open { transform: translateX(0); }
+
+.panel-header {
+  padding: 22px 28px 18px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  flex-shrink: 0;
+}
+.panel-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: transparent;
+  border: 1px solid var(--line);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  transition: all var(--dur-fast) var(--ease-out);
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+.panel-close:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+  transform: rotate(90deg);
+}
+
+.panel-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.panel-title {
+  font-family: var(--font-head);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  padding-right: 40px;
+  margin-bottom: 8px;
+}
+.panel-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.panel-meta .chip {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+.panel-meta .chip.phase { background: var(--teal-tint); color: var(--teal-strong); }
+.panel-meta .chip.tier { background: var(--surface); border: 1px solid var(--teal); color: var(--teal-strong); }
+.panel-meta .chip.tier.b { border-color: var(--gold); color: var(--gold); }
+
+.panel-body {
+  padding: 22px 28px 40px;
+  overflow-y: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.section-h {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-h.diag { color: var(--teal); }
+.section-h.intv { color: var(--pink-strong); }
+.section-h.why  { color: var(--ink-3); }
+.section-h.evidence { color: var(--gold); }
+.section-h .glyph {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.panel-section { margin-bottom: 24px; }
+
+.diag-list, .why-block { list-style: none; }
+.diag-list li {
+  position: relative;
+  padding: 4px 0 4px 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.diag-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 6px;
+  height: 1px;
+  background: var(--teal);
+}
+.diag-list li strong { color: var(--ink); font-weight: 600; }
+
+.why-block p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* -------- SUB-FORKS (Level 2) -------- */
+.subforks {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.subfork-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 7px 11px;
+  background: var(--surface-alt);
+  color: var(--ink-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.subfork-btn:hover {
+  background: var(--pink-tint);
+  color: var(--pink-strong);
+}
+.subfork-btn[data-active="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--pink-strong);
+  box-shadow: 0 2px 6px -3px var(--pink-glow);
+}
+
+.subfork-panel {
+  background: var(--surface-alt);
+  border-left: 2.5px solid var(--pink);
+  padding: 14px 16px 15px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  animation: subforkIn 0.35s var(--ease-out);
+}
+.subfork-panel .arm-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--pink-strong);
+  margin-bottom: 8px;
+}
+.subfork-panel ul { list-style: none; }
+.subfork-panel li {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  padding: 2px 0 2px 14px;
+  position: relative;
+}
+.subfork-panel li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--pink-strong);
+  font-weight: 600;
+}
+.subfork-panel .mono { color: var(--ink); font-size: 12.5px; }
+
+/* -------- EVIDENCE CHIPS (Level 3 entry) -------- */
+.evidence-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.evidence-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--ink-2);
+  transition: all var(--dur-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.evidence-chip::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.evidence-chip:hover {
+  border-color: var(--gold);
+  background: var(--gold-tint);
+  color: var(--ink);
+}
+
+/* =====================================================
+   EVIDENCE MODAL — Level 3
+   ===================================================== */
+.evidence-modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 21, 25, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-med) var(--ease-out);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.evidence-modal-scrim.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.evidence-modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: scale(0.96);
+  transition: transform var(--dur-med) var(--ease-out);
+  border-top: 3px solid var(--gold);
+  position: relative;
+}
+.evidence-modal-scrim.open .evidence-modal { transform: scale(1); }
+
+.evidence-modal-header {
+  padding: 22px 28px 16px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.evidence-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: transparent;
+  border: 1px solid var(--line);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  transition: all var(--dur-fast) var(--ease-out);
+  font-size: 14px;
+}
+.evidence-modal-close:hover { background: var(--surface-alt); color: var(--ink); transform: rotate(90deg); }
+
+.evidence-modal-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.evidence-modal-title {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  padding-right: 36px;
+  letter-spacing: -0.005em;
+}
+.evidence-modal-body {
+  padding: 18px 28px 26px;
+}
+.evidence-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 20px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: var(--surface-alt);
+  border-radius: var(--radius);
+}
+.evidence-meta-item .k {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.evidence-meta-item .v {
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.evidence-meta-item .v.mono { font-family: var(--font-mono); font-size: 12.5px; }
+
+.evidence-finding {
+  margin-bottom: 18px;
+}
+.evidence-finding h4 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.evidence-finding p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.evidence-citation {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border-left: 2px solid var(--gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.4); }
+  60%  { opacity: 1; transform: translateX(-50%) scale(1.15); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes nodeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes subforkIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes growRule {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes growAxis {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes pulseRing {
+  0%   { opacity: 0.8; transform: scale(0.9); }
+  70%  { opacity: 0; transform: scale(1.6); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+@keyframes arrowNudge {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 900px) {
+  .app-header { padding: 18px 20px 14px; }
+  h1.title { font-size: 24px; }
+  .subtitle { font-size: 13px; }
+  .case-strip {
+    flex-wrap: wrap;
+    gap: 10px 0;
+  }
+  .case-cell {
+    flex: 1 1 45%;
+    padding: 0 12px;
+    border-right: none;
+  }
+  .case-cell:nth-child(odd) { border-right: 1px solid var(--line-2); }
+  .stage { padding: 24px 16px 40px; }
+  .stage-intro h2 { font-size: 18px; }
+
+  /* Timeline becomes horizontally scrolling on mobile */
+  .timeline-wrap {
+    overflow-x: auto;
+    overflow-y: visible;
+    margin: 0 -16px;
+    padding: 0 16px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .timeline {
+    grid-template-columns: repeat(5, minmax(180px, 1fr));
+    min-width: 900px;
+  }
+
+  .panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-height: 88vh;
+    transform: translateY(100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .panel.open { transform: translateY(0); }
+  .panel-title { font-size: 18px; }
+  .panel-header { padding: 18px 20px 14px; }
+  .panel-body { padding: 18px 20px 40px; }
+
+  .evidence-meta-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+
+/* Print fallback */
+@media print {
+  .panel, .panel-scrim, .evidence-modal-scrim { display: none !important; }
+  .node { break-inside: avoid; }
+  * { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* =====================================================
+   DONOR COMPARISON MODULE
+   ===================================================== */
+.donor-module {
+  margin: 60px auto 20px;
+  max-width: 1220px;
+  padding: 0 8px;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 5.8s forwards;
+}
+.module-header {
+  max-width: 720px;
+  margin-bottom: 26px;
+}
+.module-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pink-strong);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.module-title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.18;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.module-intro {
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* -------- COMPARISON TABLE -------- */
+.donor-table-wrap {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 26px;
+}
+.donor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.donor-table thead th {
+  padding: 16px 18px 14px;
+  text-align: left;
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface-alt);
+  border-bottom: 2px solid var(--line);
+  vertical-align: bottom;
+  position: relative;
+}
+.donor-table th.th-metric {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+  width: 22%;
+}
+.donor-table th.th-ideal { color: var(--ink-3); font-style: italic; }
+.donor-table th.th-son { border-top: 3px solid var(--pink-strong); }
+.donor-table th.th-spouse { border-top: 3px solid var(--teal); }
+
+.column-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 2px;
+  margin-top: 6px;
+}
+.column-tag.reference { background: var(--surface); color: var(--ink-4); border: 1px solid var(--line); }
+.column-tag.favorable { background: var(--pink-tint); color: var(--pink-strong); }
+.column-tag.proposed  { background: var(--teal-tint); color: var(--teal-strong); }
+
+.donor-table tbody tr {
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.donor-table tbody tr:hover { background: rgba(87, 87, 91, 0.03); }
+.donor-table tbody td {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.donor-table tbody tr:last-child td { border-bottom: none; }
+.donor-table td.metric {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.donor-table td.ideal {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+.donor-table td.son, .donor-table td.spouse {
+  color: var(--ink);
+  font-size: 13px;
+}
+.donor-table td .value-strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.donor-table td .num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--ink);
+}
+.donor-table td .qualifier {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin-top: 3px;
+  line-height: 1.45;
+}
+
+/* -------- NON-IMMUNOLOGICAL PANEL -------- */
+.non-immuno-panel {
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius);
+  padding: 22px 26px 24px;
+}
+.non-immuno-title {
+  font-family: var(--font-head);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: -0.005em;
+}
+.non-immuno-intro {
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.55;
+  margin-bottom: 18px;
+  font-style: italic;
+}
+.non-immuno-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+}
+.consideration {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.consideration-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--teal);
+  margin-bottom: 5px;
+}
+.consideration-body {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.module-footer {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  color: var(--ink-4);
+  font-style: italic;
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .donor-module { margin: 40px auto 20px; padding: 0 16px; }
+  .module-title { font-size: 18px; }
+  .donor-table thead { display: none; }
+  .donor-table tbody, .donor-table tbody tr, .donor-table tbody td { display: block; width: 100%; }
+  .donor-table tbody tr {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .donor-table tbody td {
+    padding: 6px 0;
+    border: none;
+  }
+  .donor-table td.metric {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 6px;
+  }
+  .donor-table td.ideal, .donor-table td.son, .donor-table td.spouse {
+    padding: 8px 12px;
+    background: var(--surface-alt);
+    border-radius: var(--radius);
+    margin-bottom: 4px;
+  }
+  .donor-table td.ideal::before { content: 'IDEAL · '; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; color: var(--ink-4); font-weight: 600; font-style: normal; }
+  .donor-table td.son::before    { content: 'SON · ';   font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; color: var(--pink-strong); font-weight: 600; }
+  .donor-table td.spouse::before { content: 'SPOUSE · '; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; color: var(--teal); font-weight: 600; }
+  .non-immuno-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+
+/* =====================================================
+   CAPABILITIES RIBBON (in header)
+   ===================================================== */
+.capabilities-ribbon {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 0.7s forwards;
+}
+.ribbon-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+}
+.cap-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.cap-chip::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.cap-chip.engaged {
+  background: var(--surface);
+  color: var(--teal-strong);
+  border: 1px solid var(--teal);
+}
+.cap-chip.engaged::before { background: var(--teal); }
+.cap-chip.deferred {
+  background: var(--surface-alt);
+  color: var(--ink-4);
+  border: 1px dashed var(--ink-4);
+  font-style: italic;
+}
+.cap-chip.deferred::before {
+  background: transparent;
+  border: 1px solid var(--ink-4);
+}
+
+/* =====================================================
+   RANKED MODULE ("What would strengthen")
+   ===================================================== */
+.sharpen-module {
+  margin: 60px auto 20px;
+  max-width: 1220px;
+  padding: 0 8px;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 5.4s forwards;
+}
+.sharpen-header { max-width: 720px; margin-bottom: 26px; }
+.sharpen-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.sharpen-title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.18;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.sharpen-intro {
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.rank-tier {
+  margin-bottom: 24px;
+}
+.rank-tier-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rank-tier-label .tier-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+}
+.rank-tier-label .tier-mark.now { background: var(--teal-tint); color: var(--teal-strong); }
+.rank-tier-label .tier-mark.complete { background: var(--gold-tint); color: var(--gold); }
+.rank-tier-label .tier-mark.deferred { background: var(--surface-alt); color: var(--ink-3); border: 1px dashed var(--ink-4); }
+
+.rank-item {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: 20px;
+  padding: 18px 18px 18px 4px;
+  border-bottom: 1px solid var(--line-2);
+  align-items: flex-start;
+}
+.rank-item:last-child { border-bottom: none; }
+.rank-number {
+  font-family: var(--font-head);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--pink);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  padding-top: 2px;
+}
+.rank-item.tier-deferred .rank-number { color: var(--ink-4); font-style: italic; }
+.rank-content { min-width: 0; }
+.rank-item-title {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+  letter-spacing: -0.005em;
+}
+.rank-item-what {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.rank-item-why {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.rank-item-why strong { color: var(--ink); font-weight: 600; }
+.rank-item-why .mono { color: var(--ink); font-size: 12px; }
+.rank-item-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 130px;
+}
+.rank-status {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 2px;
+  text-align: right;
+}
+.rank-status.now { background: var(--teal-tint); color: var(--teal-strong); }
+.rank-status.complete { background: var(--gold-tint); color: var(--gold); }
+.rank-status.deferred { background: var(--surface-alt); color: var(--ink-3); border: 1px dashed var(--ink-4); font-style: italic; }
+.rank-effort {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-4);
+  text-align: right;
+}
+
+/* KIR module — special treatment inside ranked */
+.rank-item.kir-item {
+  background: var(--surface-alt);
+  border-radius: var(--radius);
+  border-bottom: none;
+  padding: 20px 20px 20px 8px;
+  margin-top: 10px;
+}
+.kir-callout {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border-left: 2.5px solid var(--pink);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.kir-callout .callout-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--pink-strong);
+  margin-right: 8px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* =====================================================
+   RADAR CHART — donor comparison visual
+   ===================================================== */
+.radar-wrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px 28px 24px;
+  margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 32px;
+  align-items: center;
+}
+.radar-svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+.radar-side {
+  padding: 0;
+}
+.radar-side-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.radar-legend-item {
+  padding: 8px 10px 9px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+  margin-bottom: 4px;
+}
+.radar-legend-item:hover { background: var(--surface-alt); }
+.radar-legend-item[data-active="false"] { opacity: 0.4; }
+.legend-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.legend-swatch.ideal { background: #EFEDED; border: 1px dashed var(--ink-4); }
+.legend-swatch.son { background: rgba(232, 164, 180, 0.55); border: 1.5px solid var(--pink-strong); }
+.legend-swatch.spouse { background: rgba(87, 87, 91, 0.28); border: 1.5px solid var(--teal); }
+.legend-name {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.legend-tag {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-left: auto;
+}
+.legend-tag.favorable { background: var(--pink-tint); color: var(--pink-strong); }
+.legend-tag.proposed { background: var(--teal-tint); color: var(--teal-strong); }
+.legend-tag.reference { background: var(--surface); color: var(--ink-4); border: 1px solid var(--line); }
+.legend-desc {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.45;
+  margin-top: 5px;
+  padding-left: 22px;
+}
+
+.radar-caption {
+  grid-column: 1 / -1;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.55;
+  font-style: italic;
+  text-align: center;
+}
+
+/* radar SVG element styles */
+.radar-grid-circle { fill: none; stroke: var(--line); stroke-width: 0.8; }
+.radar-axis { stroke: var(--line-2); stroke-width: 1; }
+.radar-axis-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  fill: var(--ink-3);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.radar-shape { transition: opacity var(--dur-fast) var(--ease-out); cursor: pointer; }
+.radar-shape.ideal { fill: rgba(120, 120, 124, 0.07); stroke: var(--ink-4); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.radar-shape.son { fill: rgba(232, 164, 180, 0.40); stroke: var(--pink-strong); stroke-width: 2; }
+.radar-shape.spouse { fill: rgba(120, 120, 124, 0.22); stroke: var(--teal); stroke-width: 2; }
+.radar-shape.dimmed { opacity: 0.15; }
+.radar-vertex { transition: all var(--dur-fast) var(--ease-out); }
+.radar-vertex.son { fill: var(--pink-strong); }
+.radar-vertex.spouse { fill: var(--teal); }
+
+@media (max-width: 900px) {
+  .radar-wrap { grid-template-columns: 1fr; padding: 20px 16px; }
+  .radar-svg { max-width: 380px; }
+  .rank-item { grid-template-columns: 40px 1fr; gap: 14px; padding: 14px 12px 14px 4px; }
+  .rank-item-meta { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line-2); }
+  .rank-number { font-size: 26px; }
+}
+
+/* =====================================================
+   CASE SWITCHER
+   ===================================================== */
+.case-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 6px;
+  background: var(--surface-alt);
+  border-radius: 24px;
+  width: fit-content;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 0.5s forwards;
+}
+.case-switcher-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 600;
+  padding-left: 10px;
+  padding-right: 6px;
+}
+.case-pill {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: none;
+  background: transparent;
+  color: var(--ink-3);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.case-pill:hover { background: rgba(232, 164, 180, 0.14); color: var(--ink); }
+.case-pill[data-active="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px var(--pink-strong);
+  font-weight: 600;
+}
+.case-pill .case-pill-mark {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-4);
+}
+.case-pill[data-active="true"] .case-pill-mark { background: var(--pink-strong); }
+.case-pill .case-pill-desc {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--ink-4);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@media (max-width: 900px) {
+  .case-switcher { padding: 4px; gap: 4px; }
+  .case-pill { padding: 6px 10px; font-size: 10px; }
+  .case-pill .case-pill-desc { display: none; }
+}
+
+/* =====================================================
+   CSO INTERPRETATION MODULE
+   ===================================================== */
+.cso-module {
+  margin: 60px auto 20px;
+  max-width: 1220px;
+  padding: 0 8px;
+  opacity: 0;
+  animation: fadeUp 0.7s var(--ease-out) 6.0s forwards;
+}
+.cso-wrap {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--teal);
+  background: #FBFCFC;
+  border-radius: var(--radius);
+  padding: 26px 28px 24px;
+}
+.cso-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.cso-attribution {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin-bottom: 14px;
+}
+.cso-headline {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  margin-bottom: 20px;
+  max-width: 860px;
+}
+.cso-grade-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.cso-grade { margin-bottom: 20px; }
+.cso-grade-row {
+  display: grid;
+  grid-template-columns: 22% 26% 1fr;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line-2);
+  align-items: baseline;
+}
+.cso-grade-row:last-child { border-bottom: none; }
+.cso-grade-who {
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.cso-grade-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--teal-strong);
+  font-weight: 500;
+  line-height: 1.4;
+}
+.cso-grade-note {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.cso-points {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 28px;
+}
+.cso-point {
+  border-top: 1px solid var(--line);
+  padding-top: 11px;
+}
+.cso-point-title {
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.005em;
+}
+.cso-point-body {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.cso-point-body em { color: var(--pink-strong); font-style: italic; }
+.cso-point-body .mono { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink); }
+
+@media (max-width: 900px) {
+  .cso-module { margin: 40px auto 20px; padding: 0 16px; }
+  .cso-wrap { padding: 20px 16px; }
+  .cso-headline { font-size: 16px; }
+  .cso-grade-row { grid-template-columns: 1fr; gap: 4px; padding: 10px 0; }
+  .cso-points { grid-template-columns: 1fr; gap: 12px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="eyebrow" id="main-eyebrow">SERAGEN · SNAP · CLINICAL PATHWAY · CASE DPP-01</div>
+    <h1 class="title">Precision Immunology Pathway</h1>
+    <div class="subtitle">Pre-Transplant → Year 1  ·  Living-Related Kidney Transplant</div>
+
+    <!-- Case Switcher -->
+    <div class="case-switcher" role="tablist" aria-label="Case selector">
+      <span class="case-switcher-label">Case</span>
+      <button class="case-pill" data-case-id="dpp-01" data-active="true" role="tab">
+        <span class="case-pill-mark"></span>
+        DPP-01
+        <span class="case-pill-desc">· Transplant Mumbai</span>
+      </button>
+      <button class="case-pill" data-case-id="mfs-01" data-active="false" role="tab">
+        <span class="case-pill-mark"></span>
+        MFS-01
+        <span class="case-pill-desc">· Transplant Mumbai</span>
+      </button>
+    </div>
+
+    <div class="case-strip" id="case-strip"></div>
+
+    <!-- SNAP CAPABILITIES RIBBON -->
+    <div class="capabilities-ribbon">
+      <span class="ribbon-label">SNAP · CAPABILITIES FOR THIS CASE</span>
+      <span class="cap-chip engaged">HLA molecular MM</span>
+      <span class="cap-chip engaged">CYP3A5 PGx</span>
+      <span class="cap-chip engaged">Non-HLA Ab · AT1R</span>
+      <span class="cap-chip engaged">dd-cfDNA surveillance</span>
+      <span class="cap-chip deferred" title="Available Seragen platform; deferred for this case — see recommendation module below">KIR / HLA-C · available, deferred</span>
+    </div>
+  </header>
+
+  <!-- STAGE -->
+  <main class="stage">
+    <div class="stage-intro">
+      <div class="kicker">Clinical Pathway · Interactive</div>
+      <h2>Four additive layers, mapped to when they act</h2>
+      <p>Each node below marks a diagnostic or intervention SNAP would add to standard workup, positioned at the phase where it acts. Click any node to open the recommendation. Sub-forks reveal the intervention arms; evidence chips open the underlying study.</p>
+    </div>
+
+    <div class="timeline-wrap">
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="hint">
+      Click a node to explore <span class="hint-arrow">→</span> or a phase marker for the summary
+    </div>
+  </main>
+
+  <!-- ===== RANKED SHARPENING MODULE (populated dynamically) ===== -->
+  <section class="sharpen-module" id="sharpen-module" aria-labelledby="sharpen-title"></section>
+
+  <!-- ===== DONOR COMPARISON MODULE (populated dynamically) ===== -->
+  <section class="donor-module" id="donor-module" aria-labelledby="donor-module-title"></section>
+
+  <!-- ===== CSO INTERPRETATION MODULE (populated dynamically) ===== -->
+  <section class="cso-module" id="cso-module" aria-labelledby="cso-module-title"></section>
+</div>
+
+<!-- Detail Panel -->
+<div class="panel-scrim" id="panel-scrim"></div>
+<aside class="panel" id="panel" aria-hidden="true" role="dialog">
+  <div class="panel-header">
+    <button class="panel-close" id="panel-close" aria-label="Close">×</button>
+    <div class="panel-eyebrow" id="panel-eyebrow"></div>
+    <h2 class="panel-title" id="panel-title"></h2>
+    <div class="panel-meta" id="panel-meta"></div>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</aside>
+
+<!-- Evidence Modal -->
+<div class="evidence-modal-scrim" id="evidence-scrim">
+  <div class="evidence-modal" role="dialog">
+    <div class="evidence-modal-header">
+      <button class="evidence-modal-close" id="evidence-close" aria-label="Close">×</button>
+      <div class="evidence-modal-eyebrow" id="ev-eyebrow">PRIMARY LITERATURE</div>
+      <h3 class="evidence-modal-title" id="ev-title"></h3>
+    </div>
+    <div class="evidence-modal-body">
+      <div class="evidence-meta-grid" id="ev-meta"></div>
+      <div class="evidence-finding">
+        <h4>Primary finding</h4>
+        <p id="ev-finding"></p>
+      </div>
+      <div class="evidence-finding">
+        <h4>Relevance to this case</h4>
+        <p id="ev-relevance"></p>
+      </div>
+      <div class="evidence-citation" id="ev-citation"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   DATA — CLINICAL CONTENT MODEL
+   ===================================================== */
+const PHASES = [
+  { id: 'pre-tx',       label: 'Pre-Transplant',    sub: 'workup · weeks before' },
+  { id: 'tx-day-0',     label: 'Transplant · Day 0', sub: 'induction · initial dose' },
+  { id: 'days-1-30',    label: 'Days 1 – 30',        sub: 'early monitoring' },
+  { id: 'months-1-12',  label: 'Months 1 – 12',      sub: 'surveillance rhythm' },
+  { id: 'beyond',       label: 'Year 1 +',           sub: 'sustained surveillance' }
+];
+
+const EVIDENCE = {
+  senev2020: {
+    title: 'Eplet Mismatch Load and De Novo DSA, Rejection, and Graft Failure after Kidney Transplantation',
+    journal: 'JASN', year: 2020, volume: '31:2193–2204',
+    design: 'Observational cohort, single centre',
+    n: '926 kidney recipients', method: 'HLAMatchmaker high-res retrospective typing',
+    finding: 'Antibody-verified DQ eplet mismatch load showed a linear association with dnDSA formation, rejection, and graft failure — with no safe threshold below which risk disappears. DQ eplet mismatch effect dominated other loci.',
+    relevance: 'Establishes DQ eplet mismatch as the strongest single predictor of dnDSA formation and downstream graft loss. Directly justifies extending typing to DQA1 (missing in this case) and running full eplet mismatch analysis.',
+    tier: 'A'
+  },
+  jager2024: {
+    title: 'Combined Molecular Mismatch Approaches to Predict Immunological Events Within the First Year After Renal Transplantation',
+    journal: 'HLA', year: 2024, volume: '104:e15748',
+    design: 'Retrospective cohort',
+    n: '439 standard-risk transplants', method: 'Combined eplet MM, top-10 immunogenic eplets, PIRCHE-II',
+    finding: 'Distinct risk groups for rejection were defined by combining eplet mismatch count, immunogenic eplet count, and PIRCHE-II. Combined scoring outperformed single-metric antigen-level matching for rejection prediction at 1 year.',
+    relevance: 'Contemporary evidence that combined molecular mismatch stratification (eplet + PIRCHE-II) meaningfully guides post-Tx immunosuppression intensity beyond antigen-level matching alone.',
+    tier: 'A'
+  },
+  sakamoto2020: {
+    title: 'Analysis of T and B Cell Epitopes to Predict Risk of de Novo DSA Production After Kidney Transplantation',
+    journal: 'Front Immunol', year: 2020, volume: '11:2000',
+    design: 'Two-centre retrospective cohort',
+    n: '691 living-donor kidney transplants', method: 'HLAMatchmaker + PIRCHE-II scoring',
+    finding: 'Class II eplet mismatch ≥14 associated with 20.2% dnDSA vs 3.4% below threshold. PIRCHE-II ≥176 associated with 19.8% vs 8.2% dnDSA. Both scores independently predicted class II dnDSA formation.',
+    relevance: 'Provides operating thresholds for eplet MM and PIRCHE-II that translate directly into risk stratification for this recipient / spouse-donor pair.',
+    tier: 'A'
+  },
+  nair2021: {
+    title: 'Pharmacogenetics-Based Dose Prediction Model for Initial Tacrolimus Dosing in Renal Transplant Recipients',
+    journal: 'Front Pharmacol', year: 2021, volume: '12:726784',
+    design: 'Prospective, South Indian cohort',
+    n: '145 kidney recipients', method: 'CYP3A5, CYP3A4, ABCB1 genotyping + PK modelling',
+    finding: 'Derived a South Indian population-specific dosing equation predicting starting tacrolimus dose based on CYP3A5 + CYP3A4 + ABCB1 genotype, improving time to therapeutic trough versus empirical dosing.',
+    relevance: 'The specific population reference this case sits within. Genotype-informed initial dosing is the highest-yield actionable addition to standard practice for Indian transplant recipients.',
+    tier: 'A'
+  },
+  acs2024: {
+    title: 'Synergistic Effect of CYP3A5 Genetic Variants in Tacrolimus Dose Determination in Indian Renal Transplant Patients',
+    journal: 'ACS Pharmacol Transl Sci', year: 2024, volume: '(Indian cohort)',
+    design: 'Prospective observational, clinical exome sequencing',
+    n: '219 Indian kidney recipients', method: 'Extended CYP3A5 variant panel (rs776746, rs15524, rs4646449, rs464645)',
+    finding: 'Four CYP3A5 SNPs (rs776746 + rs15524 + rs4646449 + rs464645) each significantly associated with tacrolimus C0/D ratio at multiple post-transplant time points. Extended panel improved dosing precision beyond rs776746 alone.',
+    relevance: 'Justifies extending genotyping beyond the standard rs776746 SNP to a multi-variant panel for this Indian recipient — a genuinely refined precision approach.',
+    tier: 'A'
+  },
+  rojas2020: {
+    title: 'CYP3A5 gene polymorphisms and their impact on dosage and trough concentration of tacrolimus — systematic review and meta-analysis',
+    journal: 'Pharmacogenomics J', year: 2020, volume: '20:553–562',
+    design: 'Meta-analysis',
+    n: 'Multiple cohorts (Asian + European)', method: 'Random-effects meta-analysis of C0/D ratio',
+    finding: 'Tacrolimus C0/D ratio significantly lower in CYP3A5 expressers vs non-expressers across all post-transplant periods in both Asian and European populations (p<0.00001). Effect stable and directionally consistent.',
+    relevance: 'Confirms that CYP3A5-guided dosing effect is robust across populations. Provides upper bound of confidence for the clinical decision to genotype pre-Tx.',
+    tier: 'A'
+  },
+  ctr2025: {
+    title: 'Non-HLA Antibodies in Kidney Transplantation — pathogenic mechanisms, detection methods, and clinical implications',
+    journal: 'Clin Transplant Res', year: 2025, volume: '39:214',
+    design: 'Comprehensive review',
+    n: 'Aggregate literature', method: 'Narrative review of AT1R, MICA, ETAR, anti-endothelial evidence',
+    finding: 'AT1R, MICA, and anti-endothelial antibodies show the strongest clinical relevance among non-HLA targets. AT1R detectable in 20–40% of ESRD patients pre-Tx. Pre-Tx AT1R positivity associates with elevated ABMR risk and accelerated hypertension.',
+    relevance: 'Positions non-HLA antibody screening — particularly AT1R — as a defensible clinical addition to standard workup, especially for its refractory-ABMR early-warning value.',
+    tier: 'B'
+  },
+  frontimmunol2021: {
+    title: 'Non-HLA Antibodies and Epitope Mismatches in Kidney Transplant Recipients With Histological ABMR',
+    journal: 'Front Immunol', year: 2021, volume: '',
+    design: 'Retrospective, biopsy-anchored',
+    n: 'ABMR cohort (DSA+ vs DSA−)', method: 'Pre-Tx AT1R, MICA, ETAR, EC-XM measurement',
+    finding: 'Pre-Tx AT1R Ab frequently found in ABMR-with-DSA patients. AT1R may act synergistically with preformed or de novo HLA-DSA to produce ABMR. HLA epitope mismatch associates with DSA+ ABMR specifically.',
+    relevance: 'Provides mechanistic support for AT1R as a synergistic risk factor with HLA-DSA — reinforcing the case for pre-Tx AT1R measurement in this recipient.',
+    tier: 'B'
+  },
+  admiral2022: {
+    title: 'Clinical outcomes from the ADMIRAL study',
+    journal: 'Kidney International', year: 2022, volume: '101:793–803',
+    design: 'Prospective, multicentre observational',
+    n: '1,092 adult kidney recipients · 7 US centres', method: 'dd-cfDNA surveillance (AlloSure) over 3 years',
+    finding: 'dd-cfDNA ≥ 0.5% associated with clinical and subclinical rejection. HR 2.71 for subsequent dnDSA development, detected a median of 91 days ahead of dnDSA on Luminex. Persistent elevation predicted >25% eGFR decline.',
+    relevance: 'Defines the ≥0.5% operating threshold and demonstrates a 3-month early-warning advantage over conventional serology. Directly informs the surveillance cadence proposed for this case.',
+    tier: 'A'
+  },
+  allosureregistry2025: {
+    title: 'Kidney Allograft Outcomes AlloSure Registry',
+    journal: 'Am J Transplant', year: 2025, volume: '(large multicentre)',
+    design: 'Prospective observational registry',
+    n: '1,743 kidney recipients · 56 sites', method: 'dd-cfDNA-stratified biopsy yield analysis',
+    finding: 'dd-cfDNA elevation lifted biopsy rejection yield from 7% to 39% (surveillance) and from 12% to 47% (for-cause). ABMR / mixed rejection predominated at elevated dd-cfDNA; TCMR-1A / no rejection predominated at normal dd-cfDNA.',
+    relevance: 'Contemporary registry-scale confirmation that dd-cfDNA-guided biopsy substantially outperforms unstratified biopsy, particularly for ABMR — the most consequential rejection phenotype long-term.',
+    tier: 'A'
+  },
+  bloom2017: {
+    title: 'DART study — Cell-free DNA and active rejection in kidney allografts',
+    journal: 'JASN', year: 2017, volume: '28:2221–2232',
+    design: 'Prospective, multicentre observational',
+    n: '107 biopsies from 102 patients', method: 'dd-cfDNA at biopsy time-point',
+    finding: 'At 1% cutoff, dd-cfDNA showed 59% sensitivity and 85% specificity for any acute rejection. Median dd-cfDNA 2.9% for AMR vs 1.6% for any acute rejection vs 0.2% for Banff 1A TCMR.',
+    relevance: 'Foundational demonstration that dd-cfDNA discriminates ABMR from TCMR from no-rejection at the biopsy time-point. Establishes ABMR as the phenotype dd-cfDNA best detects.',
+    tier: 'A'
+  }
+};
+
+const RECOMMENDATIONS = [
+  {
+    id: 'hla-mm',
+    number: '01',
+    title: 'HLA Molecular Mismatch',
+    subtitle: 'eplet & PIRCHE-II analysis',
+    phaseSlots: {
+      'pre-tx': { kind: 'diagnostic', label: 'Extend NGS · DQA1 + DPA1', tag: 'DIAGNOSTIC' },
+      'tx-day-0': { kind: 'intervention', label: 'Induction choice · by stratum', tag: 'INFORMS' },
+      'months-1-12': { kind: 'surveillance', label: 'DSA cadence · by stratum', tag: 'CADENCE' }
+    },
+    tier: 'A',
+    diagnostic: [
+      { html: 'Extend NGS typing to <strong>DQA1</strong> and <strong>DPA1</strong> — currently not reported' },
+      { html: 'Run <strong>HLAMatchmaker</strong> eplet mismatch analysis (v3.1+)' },
+      { html: 'Compute <strong>PIRCHE-II</strong> T-cell epitope mismatch score' },
+      { html: 'Derive <strong>combined molecular risk stratum</strong>: low / intermediate / high dnDSA risk' },
+      { html: '<span class="mono">Turnaround: 5–7 days · runnable on existing sample</span>' }
+    ],
+    subforks: [
+      {
+        id: 'high', label: 'IF HIGH RISK',
+        content: [
+          { html: 'Prefer <strong>thymoglobulin</strong> induction over basiliximab' },
+          { html: 'Higher tacrolimus target: <span class="mono">7–10 ng/mL</span> first 3 months' },
+          { html: 'Monthly DSA surveillance × 6 months' },
+          { html: 'Reinforce with dd-cfDNA at monthly cadence first 3 months' }
+        ]
+      },
+      {
+        id: 'intermediate', label: 'IF INTERMEDIATE',
+        content: [
+          { html: 'Standard induction protocol' },
+          { html: 'Standard tacrolimus target: <span class="mono">5–7 ng/mL</span>' },
+          { html: 'Monthly DSA × 3 months, then quarterly' }
+        ]
+      },
+      {
+        id: 'low', label: 'IF LOW RISK',
+        content: [
+          { html: 'Standard induction + maintenance protocol' },
+          { html: 'Routine DSA at months 3, 6, 12, then annually' },
+          { html: 'Routine dd-cfDNA at standard cadence' }
+        ]
+      }
+    ],
+    whyHere: {
+      'dpp-01': 'DQA1 typing was not reported <span class="mono">(shown as "—")</span> which means DQ eplet mismatch — the strongest single predictor of dnDSA today — cannot be computed. Separately, the recipient is markedly homozygous at HLA-A/B/C/DRB1/DQB1, narrowing self-epitope range and potentially heightening alloreactive potential to donor mismatches.',
+      'mfs-01': 'DQA1 typing was not reported <span class="mono">(shown as "—")</span> which means DQ eplet mismatch — the strongest single predictor of dnDSA today — cannot be computed. This is a standard 1-haplotype mother-son pair with <span class="mono">4/12</span> antigenic mismatch load. What sharpens the case here is the recipient\'s age: at 28, this graft will need to serve for potentially five decades — even modest elevations in eplet-level mismatch compound over that surveillance horizon.'
+    },
+    evidence: ['senev2020', 'jager2024', 'sakamoto2020']
+  },
+  {
+    id: 'cyp3a5',
+    number: '02',
+    title: 'CYP3A5 Pharmacogenomics',
+    subtitle: 'genotype-guided tacrolimus dosing',
+    phaseSlots: {
+      'pre-tx': { kind: 'diagnostic', label: 'CYP3A5 genotype · rs776746 +', tag: 'DIAGNOSTIC' },
+      'tx-day-0': { kind: 'intervention', label: 'Initial tac dose · by genotype', tag: 'DOSE' },
+      'days-1-30': { kind: 'surveillance', label: 'Trough refinement · day 3, day 14', tag: 'REFINE' }
+    },
+    tier: 'A',
+    diagnostic: [
+      { html: '<strong>Primary variant:</strong> <span class="mono">rs776746</span> (CYP3A5*3)' },
+      { html: '<strong>Extended panel</strong> (2024 Indian cohort): <span class="mono">+rs15524, +rs4646449, +rs464645</span>' },
+      { html: '<strong>Optional:</strong> <span class="mono">CYP3A4</span> (rs35599367), <span class="mono">ABCB1</span> — combined prediction' },
+      { html: '<span class="mono">Turnaround: 3–5 days · single-time-point test</span>' }
+    ],
+    subforks: [
+      {
+        id: 'expresser', label: '*1/*1  EXPRESSER',
+        content: [
+          { html: 'Start <span class="mono">~0.30 mg/kg/day</span> · <em>approximately 50% ↑ vs standard empirical</em>' },
+          { html: 'First trough <span class="mono">day 3</span> — not day 7' },
+          { html: 'Aggressive early adjustment to reach therapeutic band by end of week 1' },
+          { html: 'Higher likelihood of tacrolimus-attributable diarrhoea; anticipate' }
+        ]
+      },
+      {
+        id: 'intermediate', label: '*1/*3  INTERMEDIATE',
+        content: [
+          { html: 'Start <span class="mono">0.20 – 0.25 mg/kg/day</span>' },
+          { html: 'First trough <span class="mono">day 3</span>' },
+          { html: 'Standard therapeutic band; expect steady progression' }
+        ]
+      },
+      {
+        id: 'non-expresser', label: '*3/*3  NON-EXPRESSER',
+        content: [
+          { html: 'Start <span class="mono">~0.15 mg/kg/day</span> · <em>approximately 25% ↓ vs standard empirical</em>' },
+          { html: 'First trough <span class="mono">day 3</span>' },
+          { html: 'Watch closely for early nephrotoxicity, neurotoxicity, over-immunosuppression' },
+          { html: 'Consider lower target: <span class="mono">5–6 ng/mL</span> range' }
+        ]
+      }
+    ],
+    whyHere: {
+      'dpp-01': 'Empirical dosing week 1 is the highest-risk window for undetected under- or over-exposure. Indian population CYP3A5 allele frequencies differ meaningfully from Caucasian-normed guidance — <span class="mono">*1</span> (expresser) alleles are meaningfully more prevalent than in the Caucasian populations that dosing protocols were originally calibrated against. Low-cost, single-time-point test, durable clinical impact.',
+      'mfs-01': 'Empirical dosing week 1 is the highest-risk window for undetected under- or over-exposure. Indian population CYP3A5 allele frequencies differ meaningfully from Caucasian-normed guidance. Critically, this recipient is 28 years old — getting the initial dose right, and refining it against genotype during the highest-risk early window, has cumulative value across a five-decade tacrolimus horizon. Arguably the single most durable actionable test for this patient.'
+    },
+    evidence: ['nair2021', 'acs2024', 'rojas2020']
+  },
+  {
+    id: 'non-hla',
+    number: '03',
+    title: 'Non-HLA Antibody Screen',
+    subtitle: 'AT1R primarily',
+    phaseSlots: {
+      'pre-tx': { kind: 'diagnostic', label: 'AT1R + MICA · pre-Tx baseline', tag: 'DIAGNOSTIC' },
+      'months-1-12': { kind: 'surveillance', label: 'AT1R retest · m6 or on signal', tag: 'RETEST' }
+    },
+    tier: 'B',
+    diagnostic: [
+      { html: '<strong>Primary:</strong> AT1R antibody quantification — <span class="mono">CellTrend ELISA</span>' },
+      { html: '<strong>MICA</strong> antibody screen — Luminex single-antigen bead' },
+      { html: '<strong>Optional:</strong> ETAR antibody — evidence still emerging but plausibly independent' },
+      { html: '<span class="mono">Turnaround: 5–7 days · serum sample sufficient</span>' }
+    ],
+    subforks: [
+      {
+        id: 'at1r-pos', label: 'AT1R+ PRE-TX',
+        content: [
+          { html: 'Consider <strong>ARB / ACEi pre-treatment</strong> given RAS-pathway pathophysiology' },
+          { html: 'Escalate dd-cfDNA surveillance cadence (monthly first 3 months)' },
+          { html: 'Document AT1R-mediated ABMR as active differential for any unexplained graft dysfunction' },
+          { html: 'AT1R+ ABMR can be refractory to standard therapy — recognise early' }
+        ]
+      },
+      {
+        id: 'mica-pos', label: 'MICA+',
+        content: [
+          { html: 'Parallel surveillance workflow to HLA-DSA' },
+          { html: 'Note synergistic ABMR risk when MICA+ combines with any subsequent HLA-DSA' },
+          { html: 'MICA-directed therapy remains investigational; surveillance is the main clinical action' }
+        ]
+      },
+      {
+        id: 'negative', label: 'BOTH NEG',
+        content: [
+          { html: 'Standard post-Tx surveillance' },
+          { html: 'Retest at month 6 baseline' },
+          { html: 'Retest on any dd-cfDNA elevation not explained by HLA-DSA' }
+        ]
+      }
+    ],
+    whyHere: {
+      'dpp-01': 'AT1R antibodies are present in 20–40% of ESRD patients pre-Tx (vs 7–15% in healthy individuals). Pre-Tx positivity predicts elevated ABMR risk and accelerated post-Tx hypertension via the renin-angiotensin pathway. Refractoriness to standard antibody-directed therapy makes early recognition disproportionately valuable.',
+      'mfs-01': 'AT1R antibodies are present in 20–40% of ESRD patients pre-Tx. Pre-Tx positivity predicts elevated ABMR risk and accelerated post-Tx hypertension via the renin-angiotensin pathway. In a young recipient with a long expected surveillance horizon, unrecognised AT1R-mediated ABMR — which can be refractory to standard antibody-directed therapy — is particularly consequential; the value of establishing a pre-Tx baseline compounds over decades.'
+    },
+    evidence: ['ctr2025', 'frontimmunol2021']
+  },
+  {
+    id: 'ddcfdna',
+    number: '04',
+    title: 'dd-cfDNA Surveillance',
+    subtitle: 'structured post-transplant monitoring',
+    phaseSlots: {
+      'days-1-30': { kind: 'diagnostic', label: 'Baseline · day 30', tag: 'BASELINE' },
+      'months-1-12': { kind: 'surveillance', label: 'Serial · m2, m3, m6, m9, m12', tag: 'SERIAL' },
+      'beyond': { kind: 'surveillance', label: 'Biannual · sustained', tag: 'SUSTAIN' }
+    },
+    tier: 'A',
+    diagnostic: [
+      { html: '<strong>Baseline:</strong> dd-cfDNA at <span class="mono">day 30</span> (post-engraftment normalisation)' },
+      { html: '<strong>Serial:</strong> <span class="mono">m2, m3, m6, m9, m12</span>, then biannual' },
+      { html: '<strong>Rejection threshold:</strong> <span class="mono">≥ 0.5%</span> (ADMIRAL-validated)' },
+      { html: '<strong>Parallel:</strong> DSA at m3/m6/m12 · AT1R at m6 or on any dd-cfDNA rise without dnDSA' },
+      { html: '<em>Note:</em> limited Indian availability today — sample logistics facilitatable via SNAP; indigenisation is on the roadmap.' }
+    ],
+    subforks: [
+      {
+        id: 'elevated-dsa-pos', label: 'dd-cfDNA ≥ 0.5%, DSA+',
+        content: [
+          { html: 'Proceed to <strong>biopsy</strong> without delay' },
+          { html: 'Treat per ABMR pathway once histology confirms' },
+          { html: 'This combination is the highest-yield rejection scenario across the ADMIRAL cohort' }
+        ]
+      },
+      {
+        id: 'elevated-dsa-neg', label: 'dd-cfDNA ≥ 0.5%, DSA−',
+        content: [
+          { html: 'Repeat AT1R antibody (non-HLA-mediated ABMR differential)' },
+          { html: 'Investigate BK virus, CMV, other infection' },
+          { html: 'Consider biopsy if elevation persists across two measurements' },
+          { html: 'Trajectory > single value — trend informs interpretation' }
+        ]
+      },
+      {
+        id: 'persistent', label: 'PERSISTENT ELEVATION',
+        content: [
+          { html: 'Escalate to <strong>biopsy earlier, not later</strong>' },
+          { html: 'Persistent dd-cfDNA elevation predicts >25% eGFR decline (ADMIRAL)' },
+          { html: 'Consider MMDx molecular gene expression at biopsy if available' }
+        ]
+      },
+      {
+        id: 'cyp-signal', label: 'CYP3A5 MISMATCH SIGNAL',
+        content: [
+          { html: 'If troughs oscillate outside band despite adherence, revisit CYP3A5-informed dose' },
+          { html: 'Consider CYP3A4 + ABCB1 add-on genotyping if not already done' }
+        ]
+      }
+    ],
+    whyHere: {
+      'dpp-01': 'Elevated dd-cfDNA detects rejection a median <span class="mono">91 days</span> ahead of dnDSA on Luminex, with a 2.71 HR for subsequent dnDSA formation (ADMIRAL, n=1,092). Now recommended by both ASTS and ESOT for routine post-Tx surveillance. For an HLA-homozygous recipient with 6/12 antigenic mismatches to the spouse-donor, this early-warning capacity is disproportionately valuable.',
+      'mfs-01': 'Elevated dd-cfDNA detects rejection a median <span class="mono">91 days</span> ahead of dnDSA on Luminex, with a 2.71 HR for subsequent dnDSA formation (ADMIRAL, n=1,092). Now recommended by both ASTS and ESOT for routine post-Tx surveillance. For a 28-year-old recipient whose graft will need to serve for potentially five decades, dd-cfDNA-driven early warning compounds in value across every additional surveillance year.'
+    },
+    evidence: ['admiral2022', 'allosureregistry2025', 'bloom2017']
+  }
+];
+
+/* =====================================================
+   UI RENDER
+   ===================================================== */
+const timelineEl = document.getElementById('timeline');
+
+// Render phases + nodes
+PHASES.forEach((phase, phaseIdx) => {
+  const phaseEl = document.createElement('div');
+  phaseEl.className = 'phase';
+  phaseEl.dataset.phase = phase.id;
+
+  const label = document.createElement('div');
+  label.className = 'phase-label';
+  label.innerHTML = `${phase.label}<br><span style="opacity:0.7; font-weight:400; letter-spacing:0.14em;">${phase.sub}</span>`;
+  label.style.animationDelay = `${1.4 + phaseIdx * 0.14}s`;
+  phaseEl.appendChild(label);
+
+  const marker = document.createElement('div');
+  marker.className = 'phase-marker';
+  marker.style.animationDelay = `${1.4 + phaseIdx * 0.14}s`;
+  phaseEl.appendChild(marker);
+
+  const nodesWrap = document.createElement('div');
+  nodesWrap.className = 'phase-nodes';
+
+  // Find recommendations active in this phase
+  RECOMMENDATIONS.forEach((rec, recIdx) => {
+    const slot = rec.phaseSlots[phase.id];
+    if (!slot) return;
+
+    const node = document.createElement('div');
+    node.className = `node ${slot.kind}`;
+    node.dataset.rec = rec.id;
+    node.dataset.subforkPrefer = ''; // may set to auto-open
+
+    const nodeDelay = 2.8 + phaseIdx * 0.14 + recIdx * 0.08;
+    node.style.animationDelay = `${nodeDelay}s`;
+    node.classList.add('reveal');
+
+    node.innerHTML = `
+      <div class="node-num">${rec.number}</div>
+      <div class="node-title">${rec.title}</div>
+      <div class="node-sub">${slot.label}</div>
+      <span class="node-tag">${slot.tag}</span>
+    `;
+
+    node.addEventListener('click', () => openPanel(rec.id, phase.id));
+
+    nodesWrap.appendChild(node);
+  });
+
+  phaseEl.appendChild(nodesWrap);
+  timelineEl.appendChild(phaseEl);
+});
+
+/* =====================================================
+   PANEL — Level 1 + Level 2 interactions
+   ===================================================== */
+const panel = document.getElementById('panel');
+const panelScrim = document.getElementById('panel-scrim');
+const panelClose = document.getElementById('panel-close');
+const panelEyebrow = document.getElementById('panel-eyebrow');
+const panelTitle = document.getElementById('panel-title');
+const panelMeta = document.getElementById('panel-meta');
+const panelBody = document.getElementById('panel-body');
+
+let currentRec = null;
+let currentSubforkId = null;
+
+function openPanel(recId, contextPhaseId) {
+  const rec = RECOMMENDATIONS.find(r => r.id === recId);
+  if (!rec) return;
+  currentRec = rec;
+  currentSubforkId = rec.subforks[0].id;
+
+  // mark selected node
+  document.querySelectorAll('.node').forEach(n => n.dataset.selected = 'false');
+  document.querySelectorAll(`.node[data-rec="${recId}"]`).forEach(n => n.dataset.selected = 'true');
+
+  // eyebrow + title
+  panelEyebrow.textContent = `RECOMMENDATION ${rec.number} · ${rec.subtitle.toUpperCase()}`;
+  panelTitle.textContent = rec.title;
+
+  // meta chips
+  const phases = Object.keys(rec.phaseSlots).map(pid => {
+    const p = PHASES.find(x => x.id === pid);
+    return p ? p.label : pid;
+  }).join(' · ');
+  panelMeta.innerHTML = `
+    <span class="chip phase">${phases}</span>
+    <span class="chip tier${rec.tier === 'B' ? ' b' : ''}">Evidence · Tier ${rec.tier}</span>
+  `;
+
+  // body
+  renderPanelBody(rec);
+
+  // open
+  panel.classList.add('open');
+  panelScrim.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel() {
+  panel.classList.remove('open');
+  panelScrim.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  document.querySelectorAll('.node').forEach(n => n.dataset.selected = 'false');
+}
+
+function renderPanelBody(rec) {
+  const activeArm = rec.subforks.find(s => s.id === currentSubforkId) || rec.subforks[0];
+  const whyHereText = (typeof rec.whyHere === 'object') ? (rec.whyHere[currentCase] || rec.whyHere['dpp-01']) : rec.whyHere;
+
+  panelBody.innerHTML = `
+    <!-- WHY HERE -->
+    <div class="panel-section">
+      <div class="section-h why"><span class="glyph">◆</span> Why here · case-specific</div>
+      <div class="why-block"><p>${whyHereText}</p></div>
+    </div>
+
+    <!-- DIAGNOSTIC -->
+    <div class="panel-section">
+      <div class="section-h diag"><span class="glyph">▸</span> Diagnostic</div>
+      <ul class="diag-list">
+        ${rec.diagnostic.map(d => `<li>${d.html}</li>`).join('')}
+      </ul>
+    </div>
+
+    <!-- INTERVENTION with sub-forks -->
+    <div class="panel-section">
+      <div class="section-h intv"><span class="glyph">▸</span> Intervention · by decision arm</div>
+      <div class="subforks">
+        ${rec.subforks.map(s => `
+          <button class="subfork-btn" data-arm="${s.id}" data-active="${s.id === currentSubforkId}">${s.label}</button>
+        `).join('')}
+      </div>
+      <div class="subfork-panel" id="subfork-panel">
+        <div class="arm-label">${activeArm.label}</div>
+        <ul>
+          ${activeArm.content.map(c => `<li>${c.html}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <!-- EVIDENCE chips -->
+    <div class="panel-section">
+      <div class="section-h evidence"><span class="glyph">◆</span> Primary literature · click to drill</div>
+      <div class="evidence-chips">
+        ${rec.evidence.map(ek => {
+          const ev = EVIDENCE[ek];
+          return `<button class="evidence-chip" data-ev="${ek}">${ev.journal} ${ev.year}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  // wire subfork buttons
+  panelBody.querySelectorAll('.subfork-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSubforkId = btn.dataset.arm;
+      renderPanelBody(rec);
+    });
+  });
+
+  // wire evidence chips
+  panelBody.querySelectorAll('.evidence-chip').forEach(chip => {
+    chip.addEventListener('click', () => openEvidence(chip.dataset.ev));
+  });
+}
+
+panelClose.addEventListener('click', closePanel);
+panelScrim.addEventListener('click', closePanel);
+
+/* =====================================================
+   EVIDENCE MODAL — Level 3
+   ===================================================== */
+const evScrim = document.getElementById('evidence-scrim');
+const evClose = document.getElementById('evidence-close');
+const evTitle = document.getElementById('ev-title');
+const evMeta = document.getElementById('ev-meta');
+const evFinding = document.getElementById('ev-finding');
+const evRelevance = document.getElementById('ev-relevance');
+const evCitation = document.getElementById('ev-citation');
+
+function openEvidence(evKey) {
+  const ev = EVIDENCE[evKey];
+  if (!ev) return;
+
+  evTitle.textContent = ev.title;
+  evMeta.innerHTML = `
+    <div class="evidence-meta-item"><div class="k">Design</div><div class="v">${ev.design}</div></div>
+    <div class="evidence-meta-item"><div class="k">Sample</div><div class="v mono">${ev.n}</div></div>
+    <div class="evidence-meta-item"><div class="k">Method</div><div class="v">${ev.method}</div></div>
+    <div class="evidence-meta-item"><div class="k">Evidence Tier</div><div class="v mono">Tier ${ev.tier}</div></div>
+  `;
+  evFinding.textContent = ev.finding;
+  evRelevance.textContent = ev.relevance;
+  evCitation.textContent = `${ev.journal} ${ev.year}${ev.volume ? '; ' + ev.volume : ''}`;
+
+  evScrim.classList.add('open');
+}
+
+function closeEvidence() {
+  evScrim.classList.remove('open');
+}
+
+evClose.addEventListener('click', closeEvidence);
+evScrim.addEventListener('click', (e) => {
+  if (e.target === evScrim) closeEvidence();
+});
+
+// Esc key closes overlays
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (evScrim.classList.contains('open')) closeEvidence();
+    else if (panel.classList.contains('open')) closePanel();
+  }
+});
+
+/* =====================================================
+   CASE DATA — per-case content
+   ===================================================== */
+let currentCase = 'dpp-01';
+
+const CASES = {
+  'dpp-01': {
+    id: 'dpp-01',
+    label: 'DPP-01',
+    caseBar: [
+      { lbl: 'Recipient', val: '57M · ESRD', mono: false },
+      { lbl: 'Proposed Donor', val: 'Spouse · 47F', mono: false },
+      { lbl: 'Alternate', val: 'Son · 26M (consent)', mono: false },
+      { lbl: 'CDC / FCXM', val: 'Neg · T 0.49 · B 0.46', mono: true },
+      { lbl: 'Typing', val: 'NGS 6-loci · DQA1/DPA1 —', mono: true }
+    ],
+    sharpen: {
+      title: 'What would strengthen the recommendation — ranked by yield',
+      intro: 'Ranked by clinical yield, evidence maturity, and current-case appropriateness. The top three would materially improve the stratification we have already provided; the middle two complete the pre-transplant picture; and the final item — KIR / HLA-C profiling — is a Seragen platform capability we make explicit, alongside a candid statement of why we are not recommending it for this specific case.',
+      tiers: [
+        { label: 'Actionable now', markClass: 'now', hint: 'quantifies what is currently projected',
+          items: [
+            { rank: '01', title: 'DQA1 typing — recipient and donor', what: 'Add-on to the existing NGS panel',
+              why: 'The single highest-yield addition. Without DQA1, DQ eplet mismatch — the strongest single predictor of dnDSA today (Senev, JASN 2020) — cannot be computed. Running DQA1 on both moves eplet mismatch stratification from <em>projected</em> to <em>quantified</em>, and gives an actual low / intermediate / high dnDSA-risk stratum on which to calibrate induction, tacrolimus target, and DSA surveillance cadence.',
+              status: 'Actionable now', statusClass: 'now', effort: 'Effort · low<br>TAT · 3–5 days' },
+            { rank: '02', title: 'Donor renal function &amp; anatomic workup', what: 'eGFR (measured if available), ACR, imaging, BP profile, metabolic screen',
+              why: 'Likely already performed by the transplant unit; we simply do not have visibility yet. Completes the donor comparison table with actual numbers rather than population ranges, and lets us honestly quantify the "graft half-life projection" row rather than assign qualitative descriptors. Also lets us calibrate SNAP recommendations to <em>this donor kidney</em>, not a generic 47-year-old spouse.',
+              status: 'Report share', statusClass: 'now', effort: 'Effort · nil<br>if reports exist' },
+            { rank: '03', title: 'CYP3A5 pharmacogenomics — recipient', what: 'rs776746 primary + extended panel per 2024 Indian cohort',
+              why: 'Already Recommendation 02 in the timeline; flagged again here because it is the single highest-actionable pre-transplant test. Converts empirical week-1 tacrolimus dosing into genotype-informed dosing with specific mg/kg/day ranges — the highest-risk window for undetected under- or over-exposure in the entire post-transplant course.',
+              status: 'Actionable now', statusClass: 'now', effort: 'Effort · low<br>TAT · 3–5 days' }
+          ]
+        },
+        { label: 'Completes the picture', markClass: 'complete', hint: 'strengthens the pre-transplant risk profile',
+          items: [
+            { rank: '04', title: 'AT1R + MICA antibody quantification — recipient, pre-Tx baseline', what: 'CellTrend ELISA + Luminex single-antigen bead',
+              why: 'Already Recommendation 03 in the timeline. Baseline pre-Tx values enable proactive surveillance stratification from day zero rather than reactive investigation later. Particularly valuable given the recipient\'s HLA homozygosity, which we would want to monitor conservatively.',
+              status: 'Available', statusClass: 'complete', effort: 'Effort · low<br>TAT · 5–7 days' },
+            { rank: '05', title: 'Viral serostatus — CMV, EBV, HBV, HCV, HIV', what: 'Standard pre-Tx viral panel on recipient; CMV / EBV on both',
+              why: 'Almost certainly already performed at your unit; we simply have not seen the reports. CMV serostatus mismatch (D+/R−) is the single largest driver of post-transplant CMV disease risk and shapes prophylaxis strategy. Standard clearance, but important to have in hand for a comprehensive recommendation.',
+              status: 'Report share', statusClass: 'complete', effort: 'Effort · nil<br>if reports exist' }
+          ]
+        },
+        { label: 'Available Seragen platform · deferred this case', markClass: 'deferred', hint: 'capability made explicit; deferral is a clinical judgment call',
+          items: [
+            { rank: '06', kir: true, title: 'KIR / HLA-C ligand profiling — recipient (and donor)', what: 'NK-cell receptor genotyping paired with HLA-C ligand analysis',
+              why: 'Seragen runs KIR / HLA-C profiling routinely as a core capability of the reproductive immunology platform, and it sits within the broader SNAP toolkit. We name it here explicitly rather than omit it, so the recommendation is complete rather than convenient.',
+              callouts: [
+                { label: 'Why deferred for this specific case', body: 'For a first-transplant, HLA-compatible, related-donor pair with a negative CDC / FCXM crossmatch, the literature on KIR / HLA-C is genuinely mixed — some cohorts (van Bergen 2011) show impact on chronic rejection; others (Tran 2013, n=608) show no effect on 10-year graft survival in HLA-compatible pairs. Critically, no validated intervention adjusts induction or maintenance immunosuppression on KIR status in this donor / recipient configuration. The information, even if positive, does not change what you do today.' },
+                { label: 'Reactivation criteria', body: 'KIR profiling becomes clinically actionable if the patient develops <strong>unexplained chronic allograft dysfunction with negative DSA at year 2+</strong>, or <strong>de novo microvascular inflammation on for-cause biopsy</strong>. At that point, NK-cell-mediated microvascular injury enters the differential, and KIR / HLA-C context contributes to the workup.' },
+                { label: 'A note on cross-domain caution', body: 'Reproductive KIR / HLA-C biology (uterine NK cell tolerance during pregnancy) is a substantively different immunology from transplant tolerance. We are deliberately careful not to over-extend our reproductive-medicine expertise onto transplant nephrology decisions without underlying clinical trial evidence in this domain.' }
+              ],
+              status: 'Seragen platform<br>Deferred this case', statusClass: 'deferred', effort: 'Available on request<br>TAT · 7–10 days' }
+          ]
+        }
+      ]
+    },
+    donor: {
+      title: 'Comparing the donor options against an ideal profile',
+      intro: 'Offered as clinical observation and counselling support for family conversations about donor selection. Donor choice is a shared decision that considers donor welfare alongside recipient welfare — the panel below the table names the reasons the treating team\'s choice of the spouse-donor may be sound despite the son\'s stronger immunological profile.',
+      radar: {
+        axes: [
+          { text: 'HLA CLASS I MATCH', x: 250, y: 52, anchor: 'middle' },
+          { text: 'HLA CLASS II MATCH', x: 418, y: 150, anchor: 'start' },
+          { text: 'LOW EPLET MM', x: 418, y: 354, anchor: 'start' },
+          { text: 'RECIPIENT PROGNOSIS', x: 250, y: 454, anchor: 'middle' },
+          { text: 'LOW DONOR RISK', x: 82, y: 354, anchor: 'end' },
+          { text: 'FUTURE OPTIONS', x: 82, y: 150, anchor: 'end' }
+        ],
+        polygons: [
+          { key: 'ideal', label: 'Ideal profile', tagClass: 'reference', tagText: 'Reference', desc: 'Outer hexagon · defines maximum on each axis', values: [1,1,1,1,1,1] },
+          { key: 'son', label: 'Son · 26 M', tagClass: 'favorable', tagText: 'Immunologically favorable', desc: 'Full-locus concordance · lower donor lifetime protection · uses a future donor option', values: [1.0, 1.0, 0.95, 0.9, 0.3, 0.2] },
+          { key: 'spouse', label: 'Spouse · 47 F', tagClass: 'proposed', tagText: 'Proposed donor', desc: 'Moderate immunological match · stronger donor risk profile · preserves son as future backup', values: [0.5, 0.5, 0.45, 0.7, 0.85, 0.95] }
+        ]
+      },
+      radarCaption: 'The two shapes are visually complementary. Son\'s polygon extends outward on immunological axes; spouse\'s polygon extends outward on donor-welfare and family-preservation axes. Together they tell the story of why donor selection is a multifactorial decision — and why the immunological gap is closable through the SNAP recommendations already outlined.',
+      table: {
+        columns: [
+          { key: 'ideal', label: 'Ideal Donor Profile', tagClass: 'reference', tagText: 'Reference' },
+          { key: 'son', label: 'Son · 26 M', tagClass: 'favorable', tagText: 'Immunologically favorable' },
+          { key: 'spouse', label: 'Spouse · 47 F', tagClass: 'proposed', tagText: 'Proposed donor' }
+        ],
+        rows: [
+          { metric: 'HLA-A / B / C concordance (Class I)', cells: {
+            ideal: '6 / 6 alleles matched',
+            son: '<span class="num value-strong">6 / 6</span> — full Class I concordance<span class="qualifier">Inherited recipient\'s haplotype + wife\'s shared haplotype</span>',
+            spouse: '<span class="num">3 / 6</span> — one full haplotype shared<span class="qualifier">Expected in a 1-haplotype live-related pair</span>'
+          }},
+          { metric: 'HLA-DRB1 / DQB1 concordance (Class II)', cells: {
+            ideal: '4 / 4 alleles matched',
+            son: '<span class="num value-strong">4 / 4</span> — full Class II concordance<span class="qualifier">DQA1 not typed; concordance projected</span>',
+            spouse: '<span class="num">2 / 4</span> — half concordant<span class="qualifier">DQ eplet MM cannot be computed until DQA1 is typed</span>'
+          }},
+          { metric: 'DPB1 concordance', cells: {
+            ideal: '2 / 2 matched',
+            son: '<span class="num value-strong">2 / 2</span> — identical heterozygosity',
+            spouse: '<span class="num">1 / 2</span> — partial'
+          }},
+          { metric: 'Projected eplet mismatch load', cells: {
+            ideal: '&lt; 5 · very low',
+            son: '<span class="value-strong">Very low</span> (~ 0 on typed loci)<span class="qualifier">Effectively iso-immunogenic; near-zero dnDSA risk</span>',
+            spouse: '<span class="value-strong">Moderate</span> · full computation pending DQA1<span class="qualifier">DQ eplet MM will drive the actual stratum — highest-yield question to close</span>'
+          }},
+          { metric: 'Crossmatch result', cells: {
+            ideal: 'Negative',
+            son: 'Not performed<span class="qualifier">HLA-typed under family consent only</span>',
+            spouse: '<span class="value-strong">Negative</span> · CDC + FCXM<span class="qualifier">Formal transplant clearance completed</span>'
+          }},
+          { metric: 'Donor age at donation', cells: {
+            ideal: '20 – 45 y · peak nephron reserve',
+            son: '<span class="num">26</span> y · peak reserve',
+            spouse: '<span class="num">47</span> y · reserve intact, mild age-related decline'
+          }},
+          { metric: 'Recipient IS trajectory implication', cells: {
+            ideal: 'Standard maintenance; minimal escalation',
+            son: 'Standard maintenance; possibly lower tacrolimus targets<span class="qualifier">Enables IS minimisation strategies over time</span>',
+            spouse: 'Standard maintenance <span class="value-strong">with enhanced dnDSA surveillance</span><span class="qualifier">Addressed by SNAP Recommendation 04 (dd-cfDNA) and 01 (eplet stratification)</span>'
+          }},
+          { metric: 'Population-level graft half-life projection', cells: {
+            ideal: 'Upper range of LDKT outcomes',
+            son: 'Upper range<span class="qualifier">Individual outcomes depend on many factors beyond match</span>',
+            spouse: 'Mid-to-upper range<span class="qualifier">Reduced immunological gap through SNAP recommendations closes much of the difference</span>'
+          }}
+        ]
+      },
+      nonImmuno: {
+        title: 'Why the treating team\'s choice may be sound — non-immunological considerations',
+        intro: 'Several factors beyond immunology inform living-donor selection. The following typically favor the spouse when both options are compatible; naming them helps frame the immunological comparison in its proper context and supports counselling conversations with the family.',
+        items: [
+          { label: 'Donor lifetime kidney reserve', body: 'A 26-year-old donor lives with a single kidney for potentially 50+ years, with cumulative long-term risk (hypertension, later-life CKD). A 47-year-old donor\'s projected years post-nephrectomy are meaningfully fewer, reducing lifetime donor risk exposure.' },
+          { label: 'Preserving the son as future option', body: 'If this graft eventually fails, the son remains available as a second-transplant donor. Using the son first eliminates that future option — a decision that becomes irreversible for the family.' },
+          { label: 'Reproductive & family planning', body: 'A young adult donor may be planning to have children; while donation does not preclude this, it introduces considerations that don\'t apply to donors who have completed their family.' },
+          { label: 'Occupational & insurance impact', body: 'Long-term implications — physically demanding careers, life insurance premiums, occupational health assessments — can be material for a young adult donor over decades of remaining working life.' },
+          { label: 'Family dynamics & patient preference', body: 'In many Indian families, spouse-donation is emotionally and socially the preferred first choice. Patient preference and family consensus are legitimate clinical considerations, not merely preferences to override.' },
+          { label: 'Immunological gap is closable', body: 'The son\'s advantage is real but the gap can be substantially closed through the SNAP recommendations already outlined — eplet-stratified surveillance, CYP3A5-guided dosing, dd-cfDNA monitoring. The spouse-donor is not an inferior choice; she is a choice that requires more monitoring, which is deliverable.' }
+        ]
+      },
+      footer: 'This module is offered as clinical observation and counselling support. SNAP does not make donor-choice recommendations. Donor selection remains a shared decision between the treating team, the recipient, and the donor family.'
+    },
+    cso: {
+      headline: 'Recipient homozygosity at five loci creates an unusually favourable family donor landscape — a near-ceiling match within the family (son), plus a backup (spouse) that outperforms typical unrelated donors.',
+      grade: [
+        { who: 'Son · Ashutosh · 26M', val: '12 / 12 — full two-haplotype match (&ldquo;0-0-0&rdquo;)', note: 'Performs immunologically like an HLA-identical sibling — the best category short of a monozygotic twin — despite parent-to-child normally guaranteeing only a one-haplotype (50%) match.' },
+        { who: 'Spouse · Vijaya · 47F', val: '6 / 12 — one-haplotype (&ldquo;1-1-1&rdquo; at A/B/DR)', note: 'Performs like a one-haplotype-matched relative rather than a typical unrelated spouse (who usually shares zero haplotypes), owing to a shared population-conserved ancestral haplotype (identical-by-state).' }
+      ],
+      points: [
+        { title: 'Why the son reads as a full match', body: 'The recipient is homozygous at HLA-A/B/C/DRB1/DQB1 — every gamete he contributes is identical at those five loci, so any child was genetically guaranteed to match him there. DPB1 is the only locus carrying genuine segregation information (the son carries <span class="mono">DPB1*1315:01</span>, traceable only to the recipient).' },
+        { title: 'Spousal-donor outcomes are excellent (Terasaki, NEJM 1995)', body: 'Spousal grafts: 85% 3-year survival and a 14.5-year half-life — outperforming typical unrelated donors despite the worst HLA matching of all living-donor categories, attributable mainly to organ quality. The spouse is a well-evidenced backup, not a compromise.' },
+        { title: 'Prior-pregnancy sensitisation — prioritise DSA workup', body: 'Vijaya has a prior pregnancy (with the son). Wife-to-husband grafts with prior pregnancy trend lower (76% vs 87%). The negative CDC/FCXM crossmatch on file is reassuring; a Luminex SAB / virtual crossmatch against the recipient\'s specific alleles should still be prioritised if she is selected.' },
+        { title: 'KIR gains relevance specifically in the full-match scenario', body: 'In HLA-A/B/DR-compatible transplants — exactly what the son represents — van Bergen (2011) found KIR-ligand mismatch associated with a ~25% reduction in 10-year graft survival (HR 2.29), as NK &ldquo;missing-self&rdquo; recognition becomes the dominant residual risk once T-cell alloimmunity is neutralised. A larger CTS cohort found no effect; the literature is genuinely unresolved. <em>If the son (0-MM) is selected, recipient KIR genotyping + HLA-C group (C1/C2) + Bw4 status carries more rationale than in a partially-mismatched pair.</em>' },
+        { title: 'THOA relationship documentation', body: 'Biological parentage here is inferred from haplotype segregation — suggestive, not the gold-standard method. Recommend an orthogonal autosomal STR profile (13–20 CODIS-type loci) for the authorization-committee file.' },
+        { title: 'Screen the chosen donor for the recipient\'s native kidney disease', body: 'If the recipient\'s ESRD reflects a hereditary nephropathy (Alport, ADPKD, complement-mediated aHUS, certain FSGS), screen the son for the same condition before using his kidney — do not transplant a graft silently incubating the same disease.' }
+      ]
+    }
+  },
+
+  'mfs-01': {
+    id: 'mfs-01',
+    label: 'MFS-01',
+    caseBar: [
+      { lbl: 'Recipient', val: '28M · ESRD', mono: false },
+      { lbl: 'Proposed Donor', val: 'Mother · 45F', mono: false },
+      { lbl: 'Alternate', val: 'None HLA-typed', mono: false },
+      { lbl: 'CDC / FCXM', val: 'Neg · T 0.87 · B 0.72', mono: true },
+      { lbl: 'Typing', val: 'NGS 6-loci · DQA1/DPA1 —', mono: true }
+    ],
+    sharpen: {
+      title: 'What would strengthen the recommendation — ranked by yield',
+      intro: 'Ranked by clinical yield, evidence maturity, and current-case appropriateness. The top three would materially improve the stratification we have already provided; the middle three complete the pre-transplant picture — including a genetic panel for the recipient\'s renal disease etiology, appropriate at this age; and the final item — KIR / HLA-C profiling — is a Seragen platform capability we make explicit, alongside a candid statement of why we are not recommending it for this specific case.',
+      tiers: [
+        { label: 'Actionable now', markClass: 'now', hint: 'quantifies what is currently projected',
+          items: [
+            { rank: '01', title: 'DQA1 typing — recipient and donor', what: 'Add-on to the existing NGS panel',
+              why: 'The single highest-yield addition. Without DQA1, DQ eplet mismatch — the strongest single predictor of dnDSA today (Senev, JASN 2020) — cannot be computed. Running DQA1 on both moves eplet mismatch stratification from <em>projected</em> to <em>quantified</em>. In a 28-year-old recipient facing a five-decade surveillance horizon, quantified stratification has cumulative value across every additional year of graft function.',
+              status: 'Actionable now', statusClass: 'now', effort: 'Effort · low<br>TAT · 3–5 days' },
+            { rank: '02', title: 'Donor renal function &amp; anatomic workup', what: 'eGFR (measured if available), ACR, imaging, BP profile, metabolic screen',
+              why: 'Likely already performed by the transplant unit; we simply do not have visibility yet. Completes the donor profile with actual numbers rather than population ranges — particularly relevant for a maternal donor at 45, where post-donation kidney reserve trajectory over the mother\'s remaining life needs its own consideration.',
+              status: 'Report share', statusClass: 'now', effort: 'Effort · nil<br>if reports exist' },
+            { rank: '03', title: 'CYP3A5 pharmacogenomics — recipient', what: 'rs776746 primary + extended panel per 2024 Indian cohort',
+              why: 'Already Recommendation 02 in the timeline. Genotype-informed initial tacrolimus dosing is the highest-actionable pre-transplant test — and in a 28-year-old recipient on tacrolimus for potentially five decades, arguably the single most durable actionable test we can run. Cumulative value compounds across every year of maintenance therapy.',
+              status: 'Actionable now', statusClass: 'now', effort: 'Effort · low<br>TAT · 3–5 days' }
+          ]
+        },
+        { label: 'Completes the picture', markClass: 'complete', hint: 'strengthens the pre-transplant risk profile',
+          items: [
+            { rank: '04', title: 'AT1R + MICA antibody quantification — recipient, pre-Tx baseline', what: 'CellTrend ELISA + Luminex single-antigen bead',
+              why: 'Already Recommendation 03 in the timeline. Baseline pre-Tx values enable proactive surveillance stratification from day zero rather than reactive investigation later. Particularly valuable given the long expected surveillance horizon — unrecognised AT1R-mediated ABMR compounds across every year missed.',
+              status: 'Available', statusClass: 'complete', effort: 'Effort · low<br>TAT · 5–7 days' },
+            { rank: '05', title: 'Recipient renal-disease etiology — genetic panel', what: 'Targeted hereditary kidney disease panel — ADPKD, Alport (COL4A3/4/5), congenital nephrotic syndrome (NPHS1/2, WT1), Fabry, complement genetics',
+              why: 'Not visible in the reports we have. For a 28-year-old with ESRD, monogenic causes make up 10–15% or more of the differential. Establishing etiology matters for three reasons: (a) it shapes post-Tx recurrence risk, (b) it drives immunosuppression choice and monitoring intensity, and (c) it enables family cascade screening. If already established at your unit, this is redundant — but worth confirming rather than assuming.',
+              status: 'If not done', statusClass: 'complete', effort: 'Effort · moderate<br>TAT · 3–6 wk' },
+            { rank: '06', title: 'Viral serostatus — CMV, EBV, HBV, HCV, HIV', what: 'Standard pre-Tx viral panel on recipient; CMV / EBV on both',
+              why: 'Almost certainly already performed at your unit; we simply have not seen the reports. CMV serostatus mismatch (D+/R−) is the single largest driver of post-transplant CMV disease risk and shapes prophylaxis strategy. Standard clearance, but important to have in hand.',
+              status: 'Report share', statusClass: 'complete', effort: 'Effort · nil<br>if reports exist' }
+          ]
+        },
+        { label: 'Available Seragen platform · deferred this case', markClass: 'deferred', hint: 'capability made explicit; deferral is a clinical judgment call',
+          items: [
+            { rank: '07', kir: true, title: 'KIR / HLA-C ligand profiling — recipient (and donor)', what: 'NK-cell receptor genotyping paired with HLA-C ligand analysis',
+              why: 'Seragen runs KIR / HLA-C profiling routinely as a core capability of the reproductive immunology platform, and it sits within the broader SNAP toolkit. We name it here explicitly rather than omit it, so the recommendation is complete rather than convenient.',
+              callouts: [
+                { label: 'Why deferred for this specific case', body: 'For a first-transplant, HLA-compatible, related-donor pair with a negative CDC / FCXM crossmatch and standard 1-haplotype maternal donation, the KIR / HLA-C literature is genuinely mixed. Critically, no validated intervention adjusts induction or maintenance immunosuppression on KIR status in this donor / recipient configuration. The information, even if positive, does not change what you do today.' },
+                { label: 'Reactivation criteria', body: 'KIR profiling becomes clinically actionable if the patient develops <strong>unexplained chronic allograft dysfunction with negative DSA at year 2+</strong>, or <strong>de novo microvascular inflammation on for-cause biopsy</strong>. At that point, NK-cell-mediated microvascular injury enters the differential.' },
+                { label: 'A note on cross-domain caution', body: 'Reproductive KIR / HLA-C biology (uterine NK cell tolerance during pregnancy) is a substantively different immunology from transplant tolerance. We are deliberately careful not to over-extend our reproductive-medicine expertise onto transplant nephrology decisions without underlying clinical trial evidence in this domain.' }
+              ],
+              status: 'Seragen platform<br>Deferred this case', statusClass: 'deferred', effort: 'Available on request<br>TAT · 7–10 days' }
+          ]
+        }
+      ]
+    },
+    donor: {
+      title: 'Donor profile — mother-to-son transplant',
+      intro: 'Only the mother is HLA-typed in the reports we have. No alternate donor has been HLA-typed. The visualisation below places the proposed donor against an ideal donor profile across the same axes we use in other cases; the panel below the table names the considerations that inform family conversations about maternal donation and the option of expanding the donor pool.',
+      radar: {
+        axes: [
+          { text: 'HLA CLASS I MATCH', x: 250, y: 52, anchor: 'middle' },
+          { text: 'HLA CLASS II MATCH', x: 418, y: 150, anchor: 'start' },
+          { text: 'LOW EPLET MM', x: 418, y: 354, anchor: 'start' },
+          { text: 'RECIPIENT PROGNOSIS', x: 250, y: 454, anchor: 'middle' },
+          { text: 'LOW DONOR RISK', x: 82, y: 354, anchor: 'end' },
+          { text: 'FUTURE OPTIONS', x: 82, y: 150, anchor: 'end' }
+        ],
+        polygons: [
+          { key: 'ideal', label: 'Ideal profile', tagClass: 'reference', tagText: 'Reference', desc: 'Outer hexagon · defines maximum on each axis', values: [1,1,1,1,1,1] },
+          { key: 'mother', label: 'Mother · 45 F', tagClass: 'proposed', tagText: 'Proposed donor', desc: 'Standard 1-haplotype maternal donation · mid-life donor with stable reserve · single-donor workup', values: [0.5, 0.5, 0.5, 0.7, 0.85, 0.9] }
+        ]
+      },
+      radarCaption: 'Single-donor visualisation — proposed maternal donor against an ideal reference. The mother\'s polygon reaches strongest on donor-welfare axes (mid-life donor, stable reserve) and sits at approximately half on immunological match axes — expected for a 1-haplotype mother-child pair. Future family donor options are preserved as no alternate has been consumed by this decision.',
+      table: {
+        columns: [
+          { key: 'ideal', label: 'Ideal Donor Profile', tagClass: 'reference', tagText: 'Reference' },
+          { key: 'mother', label: 'Mother · 45 F', tagClass: 'proposed', tagText: 'Proposed donor' }
+        ],
+        rows: [
+          { metric: 'HLA-A / B / C concordance (Class I)', cells: {
+            ideal: '6 / 6 alleles matched',
+            mother: '<span class="num">3 / 6</span> — one full haplotype shared<span class="qualifier">Recipient inherited A*01:01, B*57:01, C*06:02 from mother</span>'
+          }},
+          { metric: 'HLA-DRB1 / DQB1 concordance (Class II)', cells: {
+            ideal: '4 / 4 alleles matched',
+            mother: '<span class="num">2 / 4</span> — half concordant<span class="qualifier">DQA1 not typed; DQ eplet MM cannot be computed</span>'
+          }},
+          { metric: 'DPB1 concordance', cells: {
+            ideal: '2 / 2 matched',
+            mother: '<span class="num">1 / 2</span> — partial'
+          }},
+          { metric: 'Antigenic mismatch load (recipient exposure)', cells: {
+            ideal: '&lt; 2 antigens',
+            mother: '<span class="num value-strong">4 / 12</span> antigens<span class="qualifier">B*37:01, DRB1*10:01, DQB1*05:01, DPB1*45:01 — the four donor antigens the recipient does not already carry</span>'
+          }},
+          { metric: 'Crossmatch result', cells: {
+            ideal: 'Negative',
+            mother: '<span class="value-strong">Negative</span> · CDC + FCXM<span class="qualifier">Formal transplant clearance completed. T-cell MFI 0.87, B-cell MFI 0.72</span>'
+          }},
+          { metric: 'Donor age at donation', cells: {
+            ideal: '20 – 45 y · peak nephron reserve',
+            mother: '<span class="num">45</span> y · adequate reserve, stable mid-life kidney<span class="qualifier">At the upper end of the ideal band but well within accepted donor age</span>'
+          }},
+          { metric: 'Donor Class I HLA diversity', cells: {
+            ideal: 'Heterozygous across A / B / C',
+            mother: 'Homozygous at <span class="mono">HLA-A</span> (01:01/01:01) and <span class="mono">HLA-C</span> (06:02/06:02)<span class="qualifier">Reduced Class I epitope diversity in the donor graft; observation only, not a contraindication</span>'
+          }},
+          { metric: 'Recipient IS trajectory implication', cells: {
+            ideal: 'Standard maintenance; minimal escalation',
+            mother: 'Standard maintenance <span class="value-strong">with structured dnDSA surveillance</span><span class="qualifier">Long horizon (28M) — SNAP Recommendations 01 and 04 disproportionately valuable</span>'
+          }},
+          { metric: 'Population-level graft half-life projection', cells: {
+            ideal: 'Upper range of LDKT outcomes',
+            mother: 'Mid-to-upper range<span class="qualifier">SNAP recommendations tighten the projection; recipient age favours long graft service</span>'
+          }}
+        ]
+      },
+      nonImmuno: {
+        title: 'Considerations for family counselling — maternal donation',
+        intro: 'Maternal donation to an adult child is a widely accepted and clinically appropriate choice. The following considerations frame the family conversation without second-guessing the decision the treating team and family have made.',
+        items: [
+          { label: 'Maternal donation — clinically standard', body: 'Parental donation to an adult child is common, culturally supported, and clinically appropriate. A 45-year-old mother-donor sits within the accepted donor age band with intact kidney reserve for donation.' },
+          { label: 'Post-donation implications for the mother', body: 'The mother will live with a single kidney for potentially another 30–40 years. Post-donation surveillance — annual eGFR, BP, urine ACR — is standard care and worth explicitly planning across her remaining life.' },
+          { label: 'Recipient age and graft lifetime', body: 'At 28, the recipient may need this graft to serve for five decades or more. Precision monitoring (SNAP recommendations 01 and 04) has disproportionately compounding value at this timeframe compared with older-recipient transplants.' },
+          { label: 'Family donor pool — future options preserved', body: 'Using the mother as donor does not consume alternate future donor options (father, siblings). If the family wishes to explore alternate donors — either now or as future backup — HLA typing on additional candidates would enable a comparative analysis similar to what SNAP prepares for other cases.' },
+          { label: 'Recipient etiology — for family cascade', body: 'If the underlying renal disease is monogenic (see Recommendation 05 above), family cascade screening becomes clinically relevant — for the mother\'s own kidney risk, for any siblings, and for future family planning by the recipient.' },
+          { label: 'Immunological gap is closable', body: 'The 4/12 antigenic mismatch load is expected for a 1-haplotype mother-child pair and does not require baseline IS escalation. What matters most is the surveillance rhythm — SNAP\'s eplet-stratified dnDSA schedule, CYP3A5-guided tacrolimus, and dd-cfDNA monitoring — carried consistently across decades.' }
+        ]
+      },
+      footer: 'This module is offered as clinical observation and counselling support. SNAP does not make donor-choice recommendations. Donor selection remains a shared decision between the treating team, the recipient, and the donor family.'
+    },
+    cso: {
+      headline: 'Maternal homozygosity plus the NIMA tolerance advantage make this a better-than-textbook haploidentical match — a favourable, moderately-better-than-average mother-son pair.',
+      grade: [
+        { who: 'Mother · Shagufta · 45F', val: '&ldquo;0-1-1&rdquo; at classical A/B/DR — 2 antigen mismatches', note: 'Better than the &ldquo;1-1-1&rdquo; (3 antigen MM) usually expected for an obligate one-haplotype parent, purely because the mother\'s HLA-A and HLA-C are homozygous. Locus-by-locus: <span class="mono">A 0 · B 1 · C 0 · DRB1 1 · DQB1 1 (soft) · DPB1 1</span>.' }
+      ],
+      points: [
+        { title: 'The DQB1 mismatch is &ldquo;soft&rdquo;', body: 'Donor <span class="mono">DQB1*05:01</span> vs recipient <span class="mono">*05:03</span> — different alleles within the same DQ5 broad serologic family, generally less immunogenic than a cross-family mismatch.' },
+        { title: 'NIMA tolerance advantage — unique to mother→child', body: 'In-utero exposure of the child to the mother\'s non-inherited HLA antigens (NIMA) can induce lasting partial tolerance toward those antigens. Historical multicentre analyses: sensitised patients transplanted from their mother showed improved graft survival versus from their father — <em>a tolerogenic advantage not available with any other donor category</em>, and a genuine point in this pair\'s favour.' },
+        { title: 'Relationship confirmation caveat', body: 'Unlike the trio report, this report contains no explicit biological-relationship confirmation statement; the mother-son relationship is taken as stated rather than verified by segregation. For THOA near-relative authorization, recommend independent autosomal STR-based maternity confirmation if not already on file.' },
+        { title: 'Match-grade summary', body: 'A favourable haploidentical donor, better than average by living-donor standards, strengthened by the maternal-donor NIMA advantage. The residual mismatches at B, DRB1, DQB1 and DPB1 are real and should be characterised functionally (crossmatch, DSA / virtual crossmatch, AT1R, KIR, DQ-eplet load) before final clearance.' }
+      ]
+    }
+  }
+};
+
+/* =====================================================
+   RENDER FUNCTIONS
+   ===================================================== */
+
+function renderCaseBar(caseData) {
+  const strip = document.getElementById('case-strip');
+  strip.innerHTML = caseData.caseBar.map(c => `
+    <div class="case-cell">
+      <div class="lbl">${c.lbl}</div>
+      <div class="val${c.mono ? ' mono' : ''}">${c.val}</div>
+    </div>
+  `).join('');
+}
+
+function renderEyebrow(caseData) {
+  document.getElementById('main-eyebrow').textContent = `SERAGEN · SNAP · CLINICAL PATHWAY · CASE ${caseData.label}`;
+}
+
+function renderSharpen(caseData) {
+  const s = caseData.sharpen;
+  const container = document.getElementById('sharpen-module');
+  container.innerHTML = `
+    <div class="sharpen-header">
+      <div class="sharpen-eyebrow">CASE MODULE · RECOMMENDATION SHARPENING</div>
+      <h2 class="sharpen-title" id="sharpen-title">${s.title}</h2>
+      <p class="sharpen-intro">${s.intro}</p>
+    </div>
+    ${s.tiers.map(tier => `
+      <div class="rank-tier">
+        <div class="rank-tier-label">
+          <span class="tier-mark ${tier.markClass}">${tier.label}</span>
+          <span style="color: var(--ink-4);">${tier.hint}</span>
+        </div>
+        ${tier.items.map(item => `
+          <div class="rank-item${item.kir ? ' kir-item tier-deferred' : ''}">
+            <div class="rank-number">${item.rank}</div>
+            <div class="rank-content">
+              <div class="rank-item-title">${item.title}</div>
+              <div class="rank-item-what">${item.what}</div>
+              <div class="rank-item-why">${item.why}
+                ${item.callouts ? item.callouts.map(c => `
+                  <div class="kir-callout">
+                    <span class="callout-label">${c.label}</span>
+                    ${c.body}
+                  </div>
+                `).join('') : ''}
+              </div>
+            </div>
+            <div class="rank-item-meta">
+              <span class="rank-status ${item.statusClass}">${item.status}</span>
+              <span class="rank-effort">${item.effort}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}
+  `;
+}
+
+function polygonPoints(values) {
+  // Six axes at 60° apart, center (250,250), radius 180
+  // Angles (radians) from center: -90° (top), -30°, 30°, 90°, 150°, 210°
+  const angles = [-90, -30, 30, 90, 150, 210].map(d => d * Math.PI / 180);
+  return values.map((v, i) => {
+    const x = 250 + 180 * v * Math.cos(angles[i]);
+    const y = 250 + 180 * v * Math.sin(angles[i]);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+}
+
+function polygonVertices(values, cls) {
+  const angles = [-90, -30, 30, 90, 150, 210].map(d => d * Math.PI / 180);
+  return values.map((v, i) => {
+    const x = 250 + 180 * v * Math.cos(angles[i]);
+    const y = 250 + 180 * v * Math.sin(angles[i]);
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" class="radar-vertex ${cls}"></circle>`;
+  }).join('');
+}
+
+function renderDonor(caseData) {
+  const d = caseData.donor;
+  const container = document.getElementById('donor-module');
+
+  const radarSvg = `
+    <svg class="radar-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-label="Donor comparison radar chart">
+      <!-- grid circles -->
+      <circle cx="250" cy="250" r="45" class="radar-grid-circle"></circle>
+      <circle cx="250" cy="250" r="90" class="radar-grid-circle"></circle>
+      <circle cx="250" cy="250" r="135" class="radar-grid-circle"></circle>
+      <circle cx="250" cy="250" r="180" class="radar-grid-circle"></circle>
+      <!-- axes -->
+      <line x1="250" y1="250" x2="250" y2="70" class="radar-axis"></line>
+      <line x1="250" y1="250" x2="406" y2="160" class="radar-axis"></line>
+      <line x1="250" y1="250" x2="406" y2="340" class="radar-axis"></line>
+      <line x1="250" y1="250" x2="250" y2="430" class="radar-axis"></line>
+      <line x1="250" y1="250" x2="94" y2="340" class="radar-axis"></line>
+      <line x1="250" y1="250" x2="94" y2="160" class="radar-axis"></line>
+      <!-- polygons -->
+      ${d.radar.polygons.map(p => `<polygon points="${polygonPoints(p.values)}" class="radar-shape ${p.key === 'ideal' ? 'ideal' : (p.key === 'son' ? 'son' : (p.key === 'spouse' ? 'spouse' : 'son'))}" id="radar-${p.key}"></polygon>`).join('')}
+      <!-- vertices for non-ideal shapes -->
+      ${d.radar.polygons.filter(p => p.key !== 'ideal').map(p => polygonVertices(p.values, p.key === 'spouse' ? 'spouse' : 'son')).join('')}
+      <!-- axis labels -->
+      ${d.radar.axes.map(a => `<text x="${a.x}" y="${a.y}" text-anchor="${a.anchor}" class="radar-axis-label">${a.text}</text>`).join('')}
+      <!-- center marker -->
+      <circle cx="250" cy="250" r="3" fill="#A2A2A8"></circle>
+    </svg>
+  `;
+
+  const legendItems = d.radar.polygons.map(p => `
+    <div class="radar-legend-item" data-target="${p.key}" data-active="true">
+      <div class="legend-title-row">
+        <div class="legend-swatch ${p.key === 'ideal' ? 'ideal' : (p.key === 'spouse' ? 'spouse' : 'son')}"></div>
+        <span class="legend-name">${p.label}</span>
+        <span class="legend-tag ${p.tagClass}">${p.tagText}</span>
+      </div>
+      <div class="legend-desc">${p.desc}</div>
+    </div>
+  `).join('');
+
+  const tableRows = d.table.rows.map(r => `
+    <tr>
+      <td class="metric">${r.metric}</td>
+      ${d.table.columns.map(c => `<td class="${c.key === 'ideal' ? 'ideal' : (c.key === 'spouse' ? 'spouse' : 'son')}">${r.cells[c.key] || ''}</td>`).join('')}
+    </tr>
+  `).join('');
+
+  const headerCols = d.table.columns.map(c => `
+    <th class="th-${c.key === 'ideal' ? 'ideal' : (c.key === 'spouse' ? 'spouse' : 'son')}">
+      ${c.label}
+      <span class="column-tag ${c.tagClass}">${c.tagText}</span>
+    </th>
+  `).join('');
+
+  container.innerHTML = `
+    <div class="module-header">
+      <div class="module-eyebrow">CASE MODULE · DONOR PROFILE COMPARISON</div>
+      <h2 class="module-title" id="donor-module-title">${d.title}</h2>
+      <p class="module-intro">${d.intro}</p>
+    </div>
+
+    <div class="radar-wrap">
+      ${radarSvg}
+      <div class="radar-side">
+        <div class="radar-side-title">Donor profiles</div>
+        ${legendItems}
+      </div>
+      <div class="radar-caption">${d.radarCaption}</div>
+    </div>
+
+    <div class="donor-table-wrap">
+      <table class="donor-table">
+        <thead>
+          <tr>
+            <th class="th-metric">Metric</th>
+            ${headerCols}
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+
+    <div class="non-immuno-panel">
+      <h3 class="non-immuno-title">${d.nonImmuno.title}</h3>
+      <p class="non-immuno-intro">${d.nonImmuno.intro}</p>
+      <div class="non-immuno-grid">
+        ${d.nonImmuno.items.map(i => `
+          <div class="consideration">
+            <div class="consideration-label">${i.label}</div>
+            <div class="consideration-body">${i.body}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="module-footer">${d.footer}</div>
+  `;
+
+  // Wire up radar legend interactivity for the newly-rendered elements
+  container.querySelectorAll('.radar-legend-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const target = item.dataset.target;
+      const isActive = item.dataset.active === 'true';
+      item.dataset.active = isActive ? 'false' : 'true';
+      const shape = document.getElementById('radar-' + target);
+      if (shape) shape.classList.toggle('dimmed', isActive);
+      container.querySelectorAll('.radar-vertex.' + target).forEach(v => {
+        v.style.opacity = isActive ? '0.15' : '1';
+      });
+    });
+    item.addEventListener('mouseenter', () => {
+      const target = item.dataset.target;
+      container.querySelectorAll('.radar-shape').forEach(s => {
+        if (!s.id.includes(target)) s.classList.add('dimmed');
+      });
+    });
+    item.addEventListener('mouseleave', () => {
+      container.querySelectorAll('.radar-shape').forEach(s => {
+        const targetId = s.id.replace('radar-', '');
+        const legendItem = container.querySelector(`.radar-legend-item[data-target="${targetId}"]`);
+        if (legendItem && legendItem.dataset.active === 'true') s.classList.remove('dimmed');
+      });
+    });
+  });
+}
+
+function renderCSO(caseData) {
+  const cso = caseData.cso;
+  const container = document.getElementById('cso-module');
+  if (!cso) { container.innerHTML = ''; return; }
+
+  const gradeRows = cso.grade.map(g => `
+    <div class="cso-grade-row">
+      <div class="cso-grade-who">${g.who}</div>
+      <div class="cso-grade-val">${g.val}</div>
+      <div class="cso-grade-note">${g.note}</div>
+    </div>
+  `).join('');
+
+  const points = cso.points.map(p => `
+    <div class="cso-point">
+      <div class="cso-point-title">${p.title}</div>
+      <div class="cso-point-body">${p.body}</div>
+    </div>
+  `).join('');
+
+  container.innerHTML = `
+    <div class="cso-wrap">
+      <div class="cso-eyebrow">SCIENTIFIC INTERPRETATION · OFFICE OF THE CSO</div>
+      <div class="cso-attribution">Independent immunogenetics consult · Vasanthi Palanivel, Co-founder &amp; Chief Scientific Officer</div>
+      <div class="cso-headline" id="cso-module-title">${cso.headline}</div>
+      <div class="cso-grade-label">Match-grade summary</div>
+      <div class="cso-grade">${gradeRows}</div>
+      <div class="cso-points">${points}</div>
+    </div>
+  `;
+}
+
+function switchCase(caseId) {
+  if (!CASES[caseId]) return;
+  currentCase = caseId;
+  const caseData = CASES[caseId];
+
+  // Update UI state
+  document.querySelectorAll('.case-pill').forEach(p => {
+    p.dataset.active = (p.dataset.caseId === caseId) ? 'true' : 'false';
+  });
+
+  // Re-render all case-specific sections
+  renderEyebrow(caseData);
+  renderCaseBar(caseData);
+  renderSharpen(caseData);
+  renderDonor(caseData);
+  renderCSO(caseData);
+
+  // If panel is open, refresh whyHere for new case
+  if (currentRec && panel.classList.contains('open')) {
+    renderPanelBody(currentRec);
+  }
+}
+
+// Wire up case pills
+document.querySelectorAll('.case-pill').forEach(pill => {
+  pill.addEventListener('click', () => switchCase(pill.dataset.caseId));
+});
+
+// Initial render
+renderEyebrow(CASES['dpp-01']);
+renderCaseBar(CASES['dpp-01']);
+renderSharpen(CASES['dpp-01']);
+renderDonor(CASES['dpp-01']);
+renderCSO(CASES['dpp-01']);
+
+</script>
+</body>
+</html>
