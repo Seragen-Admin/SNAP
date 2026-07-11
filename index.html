@@ -1654,6 +1654,11 @@ h1.title {
         MFS-01
         <span class="case-pill-desc">· Transplant Mumbai</span>
       </button>
+      <button class="case-pill" data-case-id="svk-01" data-active="false" role="tab">
+        <span class="case-pill-mark"></span>
+        SVK-01
+        <span class="case-pill-desc">· Transplant Mumbai</span>
+      </button>
     </div>
 
     <div class="case-strip" id="case-strip"></div>
@@ -1893,7 +1898,8 @@ const RECOMMENDATIONS = [
     ],
     whyHere: {
       'dpp-01': 'DQA1 typing was not reported <span class="mono">(shown as "—")</span> which means DQ eplet mismatch — the strongest single predictor of dnDSA today — cannot be computed. Separately, the recipient is markedly homozygous at HLA-A/B/C/DRB1/DQB1, narrowing self-epitope range and potentially heightening alloreactive potential to donor mismatches.',
-      'mfs-01': 'DQA1 typing was not reported <span class="mono">(shown as "—")</span> which means DQ eplet mismatch — the strongest single predictor of dnDSA today — cannot be computed. This is a standard 1-haplotype mother-son pair with <span class="mono">4/12</span> antigenic mismatch load. What sharpens the case here is the recipient\'s age: at 28, this graft will need to serve for potentially five decades — even modest elevations in eplet-level mismatch compound over that surveillance horizon.'
+      'mfs-01': 'DQA1 typing was not reported <span class="mono">(shown as "—")</span> which means DQ eplet mismatch — the strongest single predictor of dnDSA today — cannot be computed. This is a standard 1-haplotype mother-son pair with <span class="mono">4/12</span> antigenic mismatch load. What sharpens the case here is the recipient\'s age: at 28, this graft will need to serve for potentially five decades — even modest elevations in eplet-level mismatch compound over that surveillance horizon.',
+      'svk-01': 'DQA1 typing was not reported <span class="mono">(shown as "—")</span> so DQ eplet mismatch cannot be computed — though the <span class="mono">DQB1</span> locus itself is fully matched here (maternal homozygosity), a favourable starting point. This is a better-than-textbook mother-son pair (<span class="mono">"0-1-1"</span>, 2 antigen MM) via full A-locus concordance plus DQB1 homozygosity. DQA1 typing would complete the eplet picture on the residual B/C/DRB1/DPB1 mismatches.',
     },
     evidence: ['senev2020', 'jager2024', 'sakamoto2020']
   },
@@ -1944,7 +1950,8 @@ const RECOMMENDATIONS = [
     ],
     whyHere: {
       'dpp-01': 'Empirical dosing week 1 is the highest-risk window for undetected under- or over-exposure. Indian population CYP3A5 allele frequencies differ meaningfully from Caucasian-normed guidance — <span class="mono">*1</span> (expresser) alleles are meaningfully more prevalent than in the Caucasian populations that dosing protocols were originally calibrated against. Low-cost, single-time-point test, durable clinical impact.',
-      'mfs-01': 'Empirical dosing week 1 is the highest-risk window for undetected under- or over-exposure. Indian population CYP3A5 allele frequencies differ meaningfully from Caucasian-normed guidance. Critically, this recipient is 28 years old — getting the initial dose right, and refining it against genotype during the highest-risk early window, has cumulative value across a five-decade tacrolimus horizon. Arguably the single most durable actionable test for this patient.'
+      'mfs-01': 'Empirical dosing week 1 is the highest-risk window for undetected under- or over-exposure. Indian population CYP3A5 allele frequencies differ meaningfully from Caucasian-normed guidance. Critically, this recipient is 28 years old — getting the initial dose right, and refining it against genotype during the highest-risk early window, has cumulative value across a five-decade tacrolimus horizon. Arguably the single most durable actionable test for this patient.',
+      'svk-01': 'Empirical dosing week 1 is the highest-risk window for undetected under- or over-exposure. Indian population CYP3A5 allele frequencies differ meaningfully from Caucasian-normed guidance. The recipient is 32 — a long tacrolimus horizon ahead — so genotype-informed initial dosing, then early trough refinement, carries durable cumulative value across the graft lifetime.',
     },
     evidence: ['nair2021', 'acs2024', 'rojas2020']
   },
@@ -1993,7 +2000,8 @@ const RECOMMENDATIONS = [
     ],
     whyHere: {
       'dpp-01': 'AT1R antibodies are present in 20–40% of ESRD patients pre-Tx (vs 7–15% in healthy individuals). Pre-Tx positivity predicts elevated ABMR risk and accelerated post-Tx hypertension via the renin-angiotensin pathway. Refractoriness to standard antibody-directed therapy makes early recognition disproportionately valuable.',
-      'mfs-01': 'AT1R antibodies are present in 20–40% of ESRD patients pre-Tx. Pre-Tx positivity predicts elevated ABMR risk and accelerated post-Tx hypertension via the renin-angiotensin pathway. In a young recipient with a long expected surveillance horizon, unrecognised AT1R-mediated ABMR — which can be refractory to standard antibody-directed therapy — is particularly consequential; the value of establishing a pre-Tx baseline compounds over decades.'
+      'mfs-01': 'AT1R antibodies are present in 20–40% of ESRD patients pre-Tx. Pre-Tx positivity predicts elevated ABMR risk and accelerated post-Tx hypertension via the renin-angiotensin pathway. In a young recipient with a long expected surveillance horizon, unrecognised AT1R-mediated ABMR — which can be refractory to standard antibody-directed therapy — is particularly consequential; the value of establishing a pre-Tx baseline compounds over decades.',
+      'svk-01': 'AT1R antibodies are present in 20–40% of ESRD patients pre-Tx and are <em>not</em> captured by CDC or FCXM — so despite the reassuringly negative crossmatch on file, a dedicated AT1R screen is still warranted. Pre-Tx positivity predicts elevated ABMR risk and accelerated post-Tx hypertension via the renin-angiotensin pathway.',
     },
     evidence: ['ctr2025', 'frontimmunol2021']
   },
@@ -2051,7 +2059,8 @@ const RECOMMENDATIONS = [
     ],
     whyHere: {
       'dpp-01': 'Elevated dd-cfDNA detects rejection a median <span class="mono">91 days</span> ahead of dnDSA on Luminex, with a 2.71 HR for subsequent dnDSA formation (ADMIRAL, n=1,092). Now recommended by both ASTS and ESOT for routine post-Tx surveillance. For an HLA-homozygous recipient with 6/12 antigenic mismatches to the spouse-donor, this early-warning capacity is disproportionately valuable.',
-      'mfs-01': 'Elevated dd-cfDNA detects rejection a median <span class="mono">91 days</span> ahead of dnDSA on Luminex, with a 2.71 HR for subsequent dnDSA formation (ADMIRAL, n=1,092). Now recommended by both ASTS and ESOT for routine post-Tx surveillance. For a 28-year-old recipient whose graft will need to serve for potentially five decades, dd-cfDNA-driven early warning compounds in value across every additional surveillance year.'
+      'mfs-01': 'Elevated dd-cfDNA detects rejection a median <span class="mono">91 days</span> ahead of dnDSA on Luminex, with a 2.71 HR for subsequent dnDSA formation (ADMIRAL, n=1,092). Now recommended by both ASTS and ESOT for routine post-Tx surveillance. For a 28-year-old recipient whose graft will need to serve for potentially five decades, dd-cfDNA-driven early warning compounds in value across every additional surveillance year.',
+      'svk-01': 'Elevated dd-cfDNA detects rejection a median <span class="mono">91 days</span> ahead of dnDSA on Luminex, with a 2.71 HR for subsequent dnDSA formation (ADMIRAL, n=1,092). Now recommended by both ASTS and ESOT. Particularly valuable here given a <span class="mono">66-year-old</span> donor kidney, where structured early surveillance protects a graft with less functional reserve to spare.',
     },
     evidence: ['admiral2022', 'allosureregistry2025', 'bloom2017']
   }
@@ -2574,6 +2583,152 @@ const CASES = {
         { title: 'NIMA tolerance advantage — unique to mother→child', body: 'In-utero exposure of the child to the mother\'s non-inherited HLA antigens (NIMA) can induce lasting partial tolerance toward those antigens. Historical multicentre analyses: sensitised patients transplanted from their mother showed improved graft survival versus from their father — <em>a tolerogenic advantage not available with any other donor category</em>, and a genuine point in this pair\'s favour.' },
         { title: 'Relationship confirmation caveat', body: 'Unlike the trio report, this report contains no explicit biological-relationship confirmation statement; the mother-son relationship is taken as stated rather than verified by segregation. For THOA near-relative authorization, recommend independent autosomal STR-based maternity confirmation if not already on file.' },
         { title: 'Match-grade summary', body: 'A favourable haploidentical donor, better than average by living-donor standards, strengthened by the maternal-donor NIMA advantage. The residual mismatches at B, DRB1, DQB1 and DPB1 are real and should be characterised functionally (crossmatch, DSA / virtual crossmatch, AT1R, KIR, DQ-eplet load) before final clearance.' }
+      ]
+    }
+  },
+
+  'svk-01': {
+    id: 'svk-01',
+    label: 'SVK-01',
+    caseBar: [
+      { lbl: 'Recipient', val: '32M · ESRD', mono: false },
+      { lbl: 'Proposed Donor', val: 'Mother · 66F', mono: false },
+      { lbl: 'Alternate', val: 'None HLA-typed', mono: false },
+      { lbl: 'CDC / FCXM', val: 'Neg · T 0.74 · B 0.54', mono: true },
+      { lbl: 'Typing', val: 'NGS 6-loci · DQA1/DPA1 —', mono: true }
+    ],
+    sharpen: {
+      title: 'What would strengthen the recommendation — ranked by yield',
+      intro: 'This pair already has one of the strongest immunological green lights available — a negative CDC and negative flow crossmatch on file, not just a typing report. Ranked below: the additions that sharpen the picture further. Given the donor is 66, age-appropriate donor fitness screening rises to the top tier alongside the molecular work.',
+      tiers: [
+        { label: 'Actionable now', markClass: 'now', hint: 'donor fitness leads, given donor age 66',
+          items: [
+            { rank: '01', title: 'Donor fitness evaluation — prioritised for age 66', what: 'Cardiovascular risk assessment · measured GFR / 24-h creatinine clearance · proteinuria screen · anaesthesia fitness',
+              why: 'The single most important workstream for this pair. A 66-year-old donor sits above the typical living-donor age band; nephron reserve, age-related GFR decline, and peri-operative cardiovascular risk all need explicit characterisation before clearance. Vasanthi\'s review flags this as the priority, alongside <strong>full, pressure-free informed consent</strong> from the donor given her age.',
+              status: 'Prioritised', statusClass: 'now', effort: 'Standard donor workup' },
+            { rank: '02', title: 'DQA1 typing — recipient and donor', what: 'Add-on to the existing NGS panel',
+              why: 'Completes the eplet mismatch picture on the residual B/C/DRB1/DPB1 mismatches. Favourable starting point here: the <span class="mono">DQB1</span> locus is already fully matched (maternal homozygosity), so the DQ axis begins from strength — DQA1 typing quantifies what remains.',
+              status: 'Actionable now', statusClass: 'now', effort: 'Effort · low<br>TAT · 3–5 days' },
+            { rank: '03', title: 'CYP3A5 pharmacogenomics — recipient', what: 'rs776746 primary + extended panel per 2024 Indian cohort',
+              why: 'Genotype-informed initial tacrolimus dosing is the highest-actionable pre-transplant pharmacology test — converting empirical week-1 dosing into genotype-guided dosing during the highest-risk exposure window.',
+              status: 'Actionable now', statusClass: 'now', effort: 'Effort · low<br>TAT · 3–5 days' }
+          ]
+        },
+        { label: 'Completes the picture', markClass: 'complete', hint: 'baseline the antibody and viral status',
+          items: [
+            { rank: '04', title: 'Anti-HLA DSA (Luminex SAB) + AT1R / ETAR — recipient', what: 'Luminex single-antigen bead + CellTrend AT1R ELISA',
+              why: 'The negative crossmatch is a strong green light but does <em>not</em> rule out low-level DSA (useful as a surveillance baseline), and <strong>neither CDC nor FCXM detects non-HLA antibodies</strong> such as AT1R. A dedicated AT1R screen (HR 1.49 alone, 2.26 with DSA) is warranted regardless of the reassuring crossmatch.',
+              status: 'Available', statusClass: 'complete', effort: 'Effort · low<br>TAT · 5–7 days' },
+            { rank: '05', title: 'Recipient renal-disease etiology — genetic panel', what: 'Targeted hereditary kidney disease panel where indicated',
+              why: 'Not stated in the report. If the underlying disease is hereditary/genetic, screen the mother for the same condition before proceeding — do not transplant a kidney silently incubating the same disease. If autoimmune/immune-complex, recurrence risk is independent of donor choice.',
+              status: 'If not done', statusClass: 'complete', effort: 'Effort · moderate<br>TAT · 3–6 wk' },
+            { rank: '06', title: 'ABO grouping + CMV / EBV serostatus', what: 'ABO for both · CMV / EBV both individuals',
+              why: 'ABO grouping is not present in this report and is a mandatory gate. CMV/EBV serostatus on both guides induction and prophylaxis strategy. Standard clearances — worth confirming rather than assuming.',
+              status: 'Report share', statusClass: 'complete', effort: 'Effort · nil<br>if done' }
+          ]
+        },
+        { label: 'Structurally silenced this case · noted', markClass: 'deferred', hint: 'KIR resolves favourably on ligand grounds alone',
+          items: [
+            { rank: '07', kir: true, title: 'KIR / HLA-C ligand profiling — recipient', what: 'NK-cell receptor genotyping paired with HLA-C ligand analysis',
+              why: 'Seragen runs KIR / HLA-C profiling routinely in reproductive immunology. Here the ligand analysis resolves the question <em>before</em> genotyping is even needed.',
+              callouts: [
+                { label: 'Why the NK missing-self pathway is structurally silenced here', body: 'The recipient is <span class="mono">C2/C2</span> homozygous; the donor is <span class="mono">C1/C2</span>. Because donor cells co-express both alleles, every donor cell still displays the <strong>C2 ligand</strong> the recipient\'s licensed NK cells are tuned to recognise. The classical NK &ldquo;missing-self&rdquo; attack pathway is therefore structurally silenced for this pairing — <em>independent of the recipient\'s (untested) KIR genotype</em>.' },
+                { label: 'What this means practically', body: 'The unresolved KIR-ligand-mismatch literature (van Bergen HR 2.29 vs the null CTS cohort) does not bear on this pair, because the C2 ligand is retained on all donor cells regardless. KIR genotyping can still be run for completeness, but it is not decision-relevant here.' },
+                { label: 'Reactivation criteria', body: 'Should unexplained chronic allograft dysfunction with negative DSA develop at year 2+, KIR genotyping re-enters the workup — but on current ligand grounds this axis is favourably resolved.' }
+              ],
+              status: 'Ligand-resolved<br>Not decision-relevant', statusClass: 'deferred', effort: 'Optional · completeness' }
+          ]
+        }
+      ]
+    },
+    donor: {
+      title: 'Donor profile — mother-to-son transplant',
+      intro: 'Only the mother is HLA-typed; no alternate donor has been typed. The visualisation places the proposed donor against an ideal profile across the same axes used in other cases. The panel below the table foregrounds the consideration that most shapes this case — the donor\'s age (66) — alongside the favourable immunology.',
+      radar: {
+        axes: [
+          { text: 'HLA CLASS I MATCH', x: 250, y: 52, anchor: 'middle' },
+          { text: 'HLA CLASS II MATCH', x: 418, y: 150, anchor: 'start' },
+          { text: 'LOW EPLET MM', x: 418, y: 354, anchor: 'start' },
+          { text: 'RECIPIENT PROGNOSIS', x: 250, y: 454, anchor: 'middle' },
+          { text: 'LOW DONOR RISK', x: 82, y: 354, anchor: 'end' },
+          { text: 'FUTURE OPTIONS', x: 82, y: 150, anchor: 'end' }
+        ],
+        polygons: [
+          { key: 'ideal', label: 'Ideal profile', tagClass: 'reference', tagText: 'Reference', desc: 'Outer hexagon · defines maximum on each axis', values: [1,1,1,1,1,1] },
+          { key: 'mother', label: 'Mother · 66 F', tagClass: 'proposed', tagText: 'Proposed donor', desc: 'Better-than-textbook match (A-locus + DQB1 concordance) · donor age 66 is the key consideration · single-donor workup', values: [0.65, 0.5, 0.55, 0.7, 0.5, 0.9] }
+        ]
+      },
+      radarCaption: 'Single-donor visualisation — proposed maternal donor against an ideal reference. The immunological axes read strong (better-than-textbook match, NK pathway favourably resolved), but the "low donor risk" axis sits lower than in a younger-donor case, reflecting the age-66 fitness considerations that dominate this workup. Future family donor options remain preserved.',
+      table: {
+        columns: [
+          { key: 'ideal', label: 'Ideal Donor Profile', tagClass: 'reference', tagText: 'Reference' },
+          { key: 'mother', label: 'Mother · 66 F', tagClass: 'proposed', tagText: 'Proposed donor' }
+        ],
+        rows: [
+          { metric: 'HLA-A concordance (Class I)', cells: {
+            ideal: '2 / 2 alleles matched',
+            mother: '<span class="num value-strong">2 / 2</span> — full A-locus concordance<span class="qualifier">Both A alleles shared (02:11, 11:01) — a population-conserved &ldquo;free match&rdquo;</span>'
+          }},
+          { metric: 'HLA-B / C concordance (Class I)', cells: {
+            ideal: '4 / 4 alleles matched',
+            mother: '<span class="num">2 / 4</span> — one shared each<span class="qualifier">B*52:01 and C*12:02 are the donor antigens not carried by recipient</span>'
+          }},
+          { metric: 'HLA-DRB1 / DQB1 concordance (Class II)', cells: {
+            ideal: '4 / 4 alleles matched',
+            mother: '<span class="num value-strong">3 / 4</span><span class="qualifier">DQB1 fully matched (maternal homozygosity 06:01); one DRB1 mismatch (15:02)</span>'
+          }},
+          { metric: 'DPB1 concordance', cells: {
+            ideal: '2 / 2 matched',
+            mother: '<span class="num">1 / 2</span> — partial<span class="qualifier">Donor 04:01 not carried by recipient</span>'
+          }},
+          { metric: 'Antigenic mismatch load (recipient exposure)', cells: {
+            ideal: '&lt; 2 antigens',
+            mother: '<span class="num value-strong">4 / 12</span> · &ldquo;0-1-1&rdquo; classical<span class="qualifier">2 antigen MM at A/B/DR — better than the textbook 3 for a parent donor</span>'
+          }},
+          { metric: 'NK missing-self (KIR) risk', cells: {
+            ideal: 'Structurally low',
+            mother: '<span class="value-strong">Structurally silenced</span><span class="qualifier">Recipient C2/C2, donor C1/C2 — C2 ligand retained on all donor cells regardless of KIR</span>'
+          }},
+          { metric: 'Crossmatch result', cells: {
+            ideal: 'Negative',
+            mother: '<span class="value-strong">Negative</span> · CDC + FCXM<span class="qualifier">T-cell MFI 0.74, B-cell MFI 0.54 — no signal even in weak-positive range</span>'
+          }},
+          { metric: 'Donor age at donation', cells: {
+            ideal: '20 – 45 y · peak nephron reserve',
+            mother: '<span class="num value-strong">66</span> y · above typical band<span class="qualifier">The defining consideration — prioritise CV risk, GFR reserve, proteinuria, anaesthesia fitness, and pressure-free consent</span>'
+          }},
+          { metric: 'Population-level graft half-life projection', cells: {
+            ideal: 'Upper range of LDKT outcomes',
+            mother: 'Mid range<span class="qualifier">Favourable immunology offset by older donor kidney; recipient age (32) favours long service if graft function is adequate</span>'
+          }}
+        ]
+      },
+      nonImmuno: {
+        title: 'Considerations for family counselling — maternal donation at age 66',
+        intro: 'Maternal donation to an adult child is clinically appropriate, and the immunology here is favourable. The considerations below foreground the donor\'s age — the factor that most shapes this specific case — without second-guessing a decision that rests with the treating team and family.',
+        items: [
+          { label: 'Donor age is the defining factor', body: 'At 66, the donor is above the typical living-donor age band. This does not disqualify her, but it moves cardiovascular assessment, measured GFR / nephron reserve, proteinuria screening and anaesthesia fitness from routine to prioritised — and makes them the gating workstream before clearance.' },
+          { label: 'Pressure-free informed consent', body: 'Vasanthi\'s review explicitly flags full, pressure-free informed consent from the donor given her age. Age can compound family-dynamic pressures around donation; the consent process warrants particular care here.' },
+          { label: 'Post-donation trajectory for a 66-year-old', body: 'A 66-year-old donor lives post-nephrectomy with an already age-reduced nephron mass. Her own long-term renal surveillance (annual eGFR, BP, ACR) needs explicit planning, and her baseline reserve must be adequate to donate safely in the first place.' },
+          { label: 'Immunology is genuinely favourable', body: 'Better-than-textbook match (2 antigen MM via A-locus + DQB1 concordance), NIMA maternal-tolerance advantage, NK missing-self pathway structurally silenced, and a negative CDC + flow crossmatch already on file. The immunological case is strong; the age question is where the diligence concentrates.' },
+          { label: 'Recipient age and graft lifetime', body: 'At 32, the recipient has a long horizon ahead. This raises the value of precision monitoring — but also means the functional adequacy of an older donor kidney matters more, since it may need to serve for decades.' },
+          { label: 'Family donor pool — future options preserved', body: 'Using the mother does not consume alternate future donor options. If her age-related fitness workup raises concerns, HLA typing of other family candidates (siblings, other relatives) would enable a comparative analysis before final commitment.' }
+        ]
+      },
+      footer: 'This module is offered as clinical observation and counselling support. SNAP does not make donor-choice recommendations. Donor selection remains a shared decision between the treating team, the recipient, and the donor family.'
+    },
+    cso: {
+      headline: 'A favourable mother-to-son pairing — better-than-average haploidentical match, NIMA tolerance advantage, an NK pathway structurally silenced on ligand grounds, and an already-negative CDC + flow crossmatch. The donor\'s age (66) is where diligence concentrates.',
+      grade: [
+        { who: 'Mother · Radhika · 66F', val: '&ldquo;0-1-1&rdquo; at classical A/B/DR — 2 antigen mismatches', note: 'Better than the &ldquo;1-1-1&rdquo; (3 antigen MM) usually expected for an obligate one-haplotype parent, because of two independent &ldquo;free matches&rdquo;: full A-locus concordance and maternal DQB1 homozygosity. Locus-by-locus: <span class="mono">A 0 · B 1 · C 1 · DRB1 1 · DQB1 0 · DPB1 1</span>.' }
+      ],
+      points: [
+        { title: 'Two &ldquo;free matches&rdquo; make this better than a textbook parent', body: 'The donor\'s two HLA-A alleles are exactly the pair the recipient carries (02:11, 11:01) — a population-conserved coincidence rather than single-parent descent — and she is homozygous at DQB1 (06:01), so that locus was always going to match. Together these reduce the effective mismatch burden by roughly one-third versus an average haploidentical parent-child pair.' },
+        { title: 'NK &ldquo;missing-self&rdquo; is structurally silenced — independent of KIR genotype', body: 'The recipient is <span class="mono">C2/C2</span>; the donor is <span class="mono">C1/C2</span>. Because donor cells co-express both alleles, every donor cell still displays the C2 ligand the recipient\'s licensed NK cells are tuned to. <em>The classical NK missing-self attack pathway is therefore structurally silenced for this pairing regardless of the recipient\'s untested KIR genotype</em> — which is why the unresolved KIR-ligand literature does not bear on this pair.' },
+        { title: 'NIMA tolerance advantage — unique to mother→child', body: 'In-utero exposure of the child to the mother\'s non-inherited HLA antigens (NIMA) can induce lasting partial tolerance. Historical multicentre analyses: sensitised patients transplanted from their mother showed improved graft survival versus from their father — a tolerogenic advantage not available with any other donor category, and directly applicable here.' },
+        { title: 'The completed crossmatch is one of the strongest green lights available', body: 'A negative CDC <em>and</em> negative FCXM (T-cell MFI 0.74, B-cell MFI 0.54 — no signal even in the weak-positive range) together represent one of the strongest immunological green lights before transplant. Neither test, however, detects non-HLA antibodies (AT1R) or predicts future de novo DSA — so a dedicated AT1R screen and a Luminex SAB baseline remain warranted.' },
+        { title: 'Donor age 66 — prioritise fitness and pressure-free consent', body: 'The immunology is favourable; the diligence concentrates on the donor. Prioritise cardiovascular risk assessment, GFR reserve / 24-hour creatinine clearance, proteinuria screening, and anaesthesia fitness — and ensure full, pressure-free informed consent given her age.' },
+        { title: 'Standard completions before clearance', body: 'ABO grouping (absent from this report), DQA1 / DPA1 typing to complete eplet scoring, recipient renal-disease etiology (screen the donor for the same if hereditary), CMV / EBV serostatus on both, and an independent autosomal STR-based maternity confirmation for THOA near-relative authorization, since the current conclusion is inferred from haplotype segregation.' }
       ]
     }
   }
